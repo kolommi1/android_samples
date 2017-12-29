@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
 
@@ -148,7 +148,7 @@ public class Vec1D {
 	/**
 	 * Returns String representation of this vector with coordinate formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to the coordinate

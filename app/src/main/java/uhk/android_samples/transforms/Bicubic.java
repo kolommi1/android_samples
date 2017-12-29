@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 /**
  * Bicubic approximation surfaces in 3D, immutable

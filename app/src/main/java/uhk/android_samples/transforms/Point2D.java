@@ -1,7 +1,7 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * 2D point with homogeneous coordinates, immutable
@@ -172,7 +172,7 @@ public class Point2D {
 	 * Returns the result of multiplication by the given 3x3 matrix thus
 	 * applying the transformation contained within
 	 * 
-	 * @param m
+	 * @param mat
 	 *            3x3 matrix
 	 * @return new Point2D instance
 	 */
@@ -301,7 +301,7 @@ public class Point2D {
 	/**
 	 * Returns String representation of this point with coordinates formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to each coordinate

@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
 
@@ -282,7 +282,7 @@ public class Quat {
 	 * Creates a new quaternion equivalent to the rotation given by 
 	 * the 4x4 transformation matrix
 	 * 
-	 * @param m
+	 * @param mat
 	 *            4x4 matrix
 	 * @return new Quat instance
 	 */
@@ -516,7 +516,7 @@ public class Quat {
 	/**
 	 * Returns String representation of this quaternion with coordinate formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to the coordinate

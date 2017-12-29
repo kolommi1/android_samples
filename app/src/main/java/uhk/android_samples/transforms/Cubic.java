@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 /**
  * Cubic aproximation curves in 3D, immutable

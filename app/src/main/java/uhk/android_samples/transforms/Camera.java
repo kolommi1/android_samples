@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
 

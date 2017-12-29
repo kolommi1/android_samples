@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 /**
  * A 4x4 matrix of sequential right-handed rotation about x, y and z axes

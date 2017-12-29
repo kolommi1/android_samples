@@ -1,7 +1,7 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * 3D point with homogeneous coordinates, immutable
@@ -206,7 +206,7 @@ public class Point3D {
 	 * Returns the result of multiplication by the given 4x4 matrix thus
 	 * applying the transformation contained within
 	 * 
-	 * @param m
+	 * @param mat
 	 *            4x4 matrix
 	 * @return new Point3D instance
 	 */
@@ -343,7 +343,7 @@ public class Point3D {
 	/**
 	 * Returns String representation of this point with coordinates formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to each coordinate

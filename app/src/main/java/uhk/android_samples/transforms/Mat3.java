@@ -1,7 +1,7 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * A 3x3 matrix with common operations, immutable 
@@ -364,7 +364,7 @@ public class Mat3 {
 	/**
 	 * Returns String representation of this matrix with elements formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to each element

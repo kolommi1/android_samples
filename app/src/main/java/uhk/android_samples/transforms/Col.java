@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
 
@@ -373,7 +373,7 @@ public class Col {
 
 	/**
 	 * Returns String representation of RGBA with channels formated according to 
-	 * the given format, see {@link java.lang.String#format(String, Object...)}
+	 * the given format, see {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to each channel

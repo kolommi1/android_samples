@@ -1,7 +1,7 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 import java.util.Locale;
-import java.util.Optional;
+import java8.util.Optional;
 
 /**
  * 3D vector over real numbers (final double-precision), equivalent to 3D affine
@@ -345,7 +345,7 @@ public class Vec3D {
 	/**
 	 * Returns String representation of this vector with coordinates formated
 	 * according to the given format, see
-	 * {@link java.lang.String#format(String, Object...)}
+	 * {@link String#format(String, Object...)}
 	 * 
 	 * @param format
 	 *            String format applied to each coordinate

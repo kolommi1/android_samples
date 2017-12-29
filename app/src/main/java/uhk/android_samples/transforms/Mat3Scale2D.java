@@ -1,4 +1,4 @@
-package transforms;
+package uhk.android_samples.transforms;
 
 /**
  * A 3x3 matrix of 2D scaling
