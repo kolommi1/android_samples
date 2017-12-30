@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="uhk.android_samples.MainActivity">
+    tools:context="uhk.android_samples.lvl1basic.p00.p01buffer.MainActivity">
 
-    <uhk.android_samples.MyGLSurfaceView
-        android:id="@+id/myView"
+    <uhk.android_samples.lvl1basic.p00.p01buffer.MyGLSurfaceView
+        android:id="@+id/sample_GL_View"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
