@@ -1,4 +1,4 @@
-package uhk.android_samples.lvl1basic.p00.p01buffer;
+package uhk.android_samples.lvl1basic.p01start.p02attribute;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -13,7 +13,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Sending minimal geometry to GPU and compiling a shader from a string
+ * Adding another attribute (color) to vertices via vertex buffer *
  */
 public class Renderer implements GLSurfaceView.Renderer {
 
@@ -24,6 +24,10 @@ public class Renderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
         // barva pozadí
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        //TODO: check shader support
+        //OGLUtils.shaderCheck(gl);
+        //TODO: print GL parametres
+        //OGLUtils.printOGLparameters(gl);
 
         createBuffers();
         createShaders();
@@ -56,9 +60,9 @@ public class Renderer implements GLSurfaceView.Renderer {
     private void createBuffers(){
         // create and fill vertex buffer data
         float[] vertexBufferData = {
-            -1, -1,
-            1, 0,
-            0, 1
+            -1, -1, 	0.7f, 0, 0,
+            1,  0,		0, 0.7f, 0,
+            0,  1,		0, 0, 0.7f
         };
         // create buffer required for sending data to a native library
         FloatBuffer vertexBufferBuffer = ByteBuffer.allocateDirect(vertexBufferData.length * 4)
@@ -88,8 +92,11 @@ public class Renderer implements GLSurfaceView.Renderer {
     private void createShaders(){
         String shaderVertSrc =
                 "attribute vec2 inPosition;" + // input from the vertex buffer
+                "attribute vec3 inColor;" + // input from the vertex buffer
+                "varying vec3 vertColor;" + // output from this shader to the next pipeline stage
                 "void main() {" +
                 " 	gl_Position = vec4(inPosition, 0.0, 1.0);" +
+                "   vertColor = inColor;"+
                 "}"
         ;
         // gl_Position - built-in vertex shader output variable containing
@@ -98,8 +105,9 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         String shaderFragSrc =
                 "precision mediump float;" +
+                "varying vec3 vertColor;"+ // input from the previous pipeline stage
                 "void main() {" +
-                " 	gl_FragColor = vec4(0.5,0.1,0.8, 1.0);" + //output
+                " 	gl_FragColor = vec4(vertColor, 1.0);" + //output
                 "}"
         ;
 
@@ -161,16 +169,16 @@ public class Renderer implements GLSurfaceView.Renderer {
     private void bindBuffers() {
         // internal OpenGL ID of a vertex shader input variable
         int locPosition = GLES20.glGetAttribLocation(shaderProgram, "inPosition");
+        int locColor = GLES20.glGetAttribLocation(shaderProgram, "inColor");
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBuffer[0]);
-        // bind the shader variable to specific part of vertex data (attribute)
-        // - describe how many components of which type correspond to it in the
-        // data, how large is one vertex (its stride in bytes) and at which byte
-        // of the vertex the first component starts
-        // 2 components(2 coordinates per vertex), of type float, do not normalize (convert to [0,1]),
-        // vertex of 8 bytes( 2*4 - numberOfCoordinates*bytesPerFloat ), start at the beginning (byte 0)
-        GLES20.glVertexAttribPointer(locPosition, 2, GLES20.GL_FLOAT, false, 8, 0);
         GLES20.glEnableVertexAttribArray(locPosition);
+        // shader variable ID, number of components, type of components,
+        // normalize?, size of a vertex in bytes, location of first component
+        GLES20.glVertexAttribPointer(locPosition, 2, GLES20.GL_FLOAT, false, 20, 0);
+        GLES20.glEnableVertexAttribArray(locColor);
+        // color information starts at 0 + 8(position) = 8
+        GLES20.glVertexAttribPointer(locColor, 3, GLES20.GL_FLOAT, false, 20, 8);
 
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
     }
