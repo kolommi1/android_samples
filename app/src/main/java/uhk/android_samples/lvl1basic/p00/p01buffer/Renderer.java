@@ -118,6 +118,10 @@ public class Renderer implements GLSurfaceView.Renderer {
                 vs = 0;
             }
         }
+        else
+        {
+            throw new RuntimeException("Error creating vertex shader.");
+        }
 
         // fragment shader - create and compile
         int fs = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
@@ -133,6 +137,10 @@ public class Renderer implements GLSurfaceView.Renderer {
                 GLES20.glDeleteShader(fs);
                 fs = 0;
             }
+        }
+        else
+        {
+            throw new RuntimeException("Error creating fragment shader.");
         }
 
         // create and link program
@@ -155,6 +163,10 @@ public class Renderer implements GLSurfaceView.Renderer {
             if (fs > 0) GLES20.glDetachShader(shaderProgram, fs);
             if (vs > 0) GLES20.glDeleteShader(vs);
             if (fs > 0) GLES20.glDeleteShader(fs);
+        }
+        else
+        {
+            throw new RuntimeException("Error creating program");
         }
     }
 
