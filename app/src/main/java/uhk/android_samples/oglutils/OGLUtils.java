@@ -1,144 +1,150 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
-import static oglutils.ShaderUtils.GEOMETRY_SHADER_SUPPORT_VERSION;
-import static oglutils.ShaderUtils.TESSELATION_SUPPORT_VERSION;
-import static oglutils.ShaderUtils.COMPUTE_SHADER_SUPPORT_VERSION;
+import android.opengl.GLES20;
+import android.opengl.GLES30;
+import android.opengl.GLES31;
+import android.util.Log;
 
-import com.jogamp.opengl.DebugGL2;
-import com.jogamp.opengl.DebugGL3;
-import com.jogamp.opengl.DebugGL4;
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2GL3;
-import com.jogamp.opengl.GLProfile;
+import static uhk.android_samples.oglutils.ShaderUtils.COMPUTE_SHADER_SUPPORT_VERSION;
+import static uhk.android_samples.oglutils.ShaderUtils.FRAGMENT_SHADER_SUPPORT_VERSION;
+import static uhk.android_samples.oglutils.ShaderUtils.VERTEX_SHADER_SUPPORT_VERSION;
 
 public class OGLUtils {
-
+	private static final String TAG = "OGLESutils";
 	/**
-	 * Print version, vendor and extensions of current OpenGL
-	 * 
-	 * @param gl
-	 *            OpenGL context
+	 * Print version, vendor and extensions of current OpenGL ES
+	 * @param maxGlEsVersion maximum supported OpenGL ES version
 	 */
-	public static void printOGLparameters(GL2GL3 gl) {
-		if (gl == null)
-			return;
-
-		System.out.println("GLProfile name: " + GLProfile.getDefault().getName());
-		System.out.println("GLProfile implementation: " + GLProfile.getDefault().getName());
-		System.out.println("GL class: " + gl.getClass().getName());
-		System.out.println("GL vendor: " + gl.glGetString(GL2GL3.GL_VENDOR));
-		System.out.println("GL renderer: " + gl.glGetString(GL2GL3.GL_RENDERER));
-		System.out.println("GL version: " + gl.glGetString(GL2GL3.GL_VERSION));
-		System.out.println("GL shading language version: " + gl.glGetString(GL2GL3.GL_SHADING_LANGUAGE_VERSION)
-				+ " (#version " + getVersionGLSL(gl) + ")");
-		System.out.println("GL extensions: " + getExtensions(gl));
-
-	}
-
-	/**
-	 * Get extensions of current OpenGL
-	 * 
-	 */
-	public static String getExtensions(GL2GL3 gl) {
-		String extensions;
-		if (getVersionGLSL(gl) < getVersionOpenGL(gl)) {
-			// Deprecated in newer versions
-			extensions = gl.glGetString(GL2GL3.GL_EXTENSIONS);
-		} else {
-			int[] numberExtensions = new int[1];
-			gl.glGetIntegerv(GL2GL3.GL_NUM_EXTENSIONS, numberExtensions, 0);
-			extensions = gl.glGetStringi(GL2GL3.GL_EXTENSIONS, 1);
-			for (int i = 1; i < numberExtensions[0]; i++) {
-				extensions = extensions + " " + gl.glGetStringi(GL2GL3.GL_EXTENSIONS, i);
-			}
+	public static void printOGLparameters(int maxGlEsVersion) {
+		if(maxGlEsVersion >= 0x31000){
+			Log.i(TAG,"GLES vendor: " + GLES31.glGetString(GLES31.GL_VENDOR));
+			Log.i(TAG, "GLES renderer: " + GLES31.glGetString(GLES31.GL_RENDERER));
+			Log.i(TAG,"GLES version: " + GLES31.glGetString(GLES31.GL_VERSION));
+			Log.i(TAG,"GLES shading language version: " + GLES31.glGetString(GLES31.GL_SHADING_LANGUAGE_VERSION)
+					+ " (#version " + getVersionGLSL(maxGlEsVersion) + ")");
+			Log.i(TAG,"GLES extensions: " + GLES31.glGetString(GLES31.GL_EXTENSIONS));
 		}
-		return extensions;
+		else if(maxGlEsVersion >= 0x30000){
+			Log.i(TAG,"GLES vendor: " + GLES30.glGetString(GLES30.GL_VENDOR));
+			Log.i(TAG, "GLES renderer: " + GLES30.glGetString(GLES30.GL_RENDERER));
+			Log.i(TAG,"GLES version: " + GLES30.glGetString(GLES30.GL_VERSION));
+			Log.i(TAG,"GLES shading language version: " + GLES30.glGetString(GLES30.GL_SHADING_LANGUAGE_VERSION)
+					+ " (#version " + getVersionGLSL(maxGlEsVersion) + ")");
+			Log.i(TAG,"GLES extensions: " + GLES30.glGetString(GLES31.GL_EXTENSIONS));
+		}
+		else{
+			Log.i(TAG,"GLES vendor: " + GLES20.glGetString(GLES20.GL_VENDOR));
+			Log.i(TAG, "GLES renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
+			Log.i(TAG,"GLES version: " + GLES20.glGetString(GLES20.GL_VERSION));
+			Log.i(TAG,"GLES shading language version: " + GLES20.glGetString(GLES20.GL_SHADING_LANGUAGE_VERSION)
+					+ " (#version " + getVersionGLSL(maxGlEsVersion) + ")");
+			Log.i(TAG,"GLES extensions: " + GLES31.glGetString(GLES20.GL_EXTENSIONS));
+		}
 	}
 
 	/**
 	 * Get supported GLSL version
-	 * 
-	 * @return version as integer number multiplied by 100, for GLSL 1.4 return
-	 *         140, for GLSL 4.5 return 450, ...
+	 *
+	 * @param maxGlEsVersion maximum supported OpenGL ES version
+	 * @return version as integer number multiplied by 100, for GLSL 1.0 return
+	 *         100...
 	 */
-	public static int getVersionGLSL(GL2GL3 gl) {
-		String version = new String(gl.glGetString(GL2GL3.GL_SHADING_LANGUAGE_VERSION));
+	public static int getVersionGLSL(int maxGlEsVersion) {
+
+		String version;
+		if(maxGlEsVersion >= 0x30000){
+			version = GLES30.glGetString(GLES30.GL_SHADING_LANGUAGE_VERSION);
+		}
+		else{
+			version = GLES20.glGetString(GLES20.GL_SHADING_LANGUAGE_VERSION);
+		}
 		String[] parts = version.split(" ");
-		parts = parts[0].split("\\.");
-		int versionNumber = Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
-		return versionNumber;
+		parts = parts[4].split("\\.");
+		return Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]);
 	}
 
 	/**
 	 * Get supported OpenGL version
-	 * 
-	 * @return version as integer number multiplied by 100, for OpenGL 3.3
-	 *         return 330, ...
+	 *
+	 * @param maxGlEsVersion maximum supported OpenGL ES version
+	 * @return version as integer number multiplied by 100, for OpenGL ES 3.1
+	 *         return 310, ...
 	 */
-	public static int getVersionOpenGL(GL2GL3 gl) {
-		String version = new String(gl.glGetString(GL.GL_VERSION));
+	public static int getVersionOpenGL(int maxGlEsVersion) {
+		String version;
+		if (maxGlEsVersion >= 0x31000){
+			version = GLES31.glGetString(GLES31.GL_VERSION);
+		}
+		else if(maxGlEsVersion >= 0x30000){
+			version = GLES30.glGetString(GLES30.GL_VERSION);
+		}
+		else{
+			version = GLES20.glGetString(GLES20.GL_VERSION);
+		}
 		String[] parts = version.split(" ");
-		parts = parts[0].split("\\.");
-		int versionNumber = Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]) * 10;
-		return versionNumber;
+		parts = parts[2].split("\\.");
+		return Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]) * 10;
 	}
 
-	/**
+/*	/**
 	 * Print parameters of current JOGL
 	 * 
 	 */
-	public static void printJOGLparameters() {
+/*	public static void printJOGLparameters() {
 		Package p = Package.getPackage("com.jogamp.opengl");
 		System.out.println("JOGL specification version: " + p.getSpecificationVersion());
 		System.out.println("JOGL implementation version: " + p.getImplementationVersion());
 		System.out.println("JOGL implementation title: " + p.getImplementationTitle());
 		System.out.println("JOGL implementation vendor: " + p.getImplementationVendor());
-	}
+	}*/
 
-	/**
+/*	/**
 	 * Print parameters of current JAVA
 	 * 
 	 */
-	public static void printJAVAparameters() {
+/*	public static void printJAVAparameters() {
 		System.out.println("Java version: " + System.getProperty("java.version"));
 		System.out.println("Java vendor: " + System.getProperty("java.vendor"));
-	}
+	}*/
 
 	/**
 	 * Check OpenGL shaders support
-	 * 
-	 * @param gl
+	 *
+	 * @param maxGlEsVersion maximum supported OpenGL ES version
 	 */
-	public static void shaderCheck(GL2GL3 gl) {
-		String extensions = gl.glGetString(GL.GL_EXTENSIONS);
+	public static void shaderCheck(int maxGlEsVersion) {
+		String extensions;
+		if(maxGlEsVersion >= 0x31000){
+			extensions = GLES30.glGetString(GLES31.GL_EXTENSIONS);
+		}
+		else if(maxGlEsVersion >= 0x30000){
+			extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+		}
+		else{
+			extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+		}
 
-		if ((OGLUtils.getVersionGLSL(gl) < getVersionOpenGL(gl)) && (extensions.indexOf("GL_ARB_vertex_shader") == -1
-				|| extensions.indexOf("GL_ARB_fragment_shader") == -1)) {
+		if ( (OGLUtils.getVersionGLSL(maxGlEsVersion) < VERTEX_SHADER_SUPPORT_VERSION
+				|| OGLUtils.getVersionGLSL(maxGlEsVersion) < FRAGMENT_SHADER_SUPPORT_VERSION)
+				&& (!extensions.contains("GL_ARB_vertex_shader") || !extensions.contains("GL_ARB_fragment_shader")) ) {
 			throw new RuntimeException("Shaders are not available.");
 		}
 
-		System.out.println("This OpenGL (#version " + getVersionGLSL(gl) + ") supports:\n vertex and fragment shader");
+		Log.i(TAG,"This OpenGL ES (shader #version: " + getVersionGLSL(maxGlEsVersion) + ") supports:\n vertex and fragment shader");
 
-		if ((OGLUtils.getVersionGLSL(gl) >= GEOMETRY_SHADER_SUPPORT_VERSION)
-				|| (extensions.indexOf("geometry_shader") != -1))
-			System.out.println(" geometry shader");
-
-		if ((OGLUtils.getVersionGLSL(gl) >= TESSELATION_SUPPORT_VERSION)
-				|| (extensions.indexOf("tessellation_shader") != -1))
-			System.out.println(" tessellation");
-
-		if ((OGLUtils.getVersionGLSL(gl) >= COMPUTE_SHADER_SUPPORT_VERSION)
-				|| (extensions.indexOf("compute_shader") != -1))
-			System.out.println(" compute shader");
+		if ((OGLUtils.getVersionGLSL(maxGlEsVersion) >= COMPUTE_SHADER_SUPPORT_VERSION)
+				|| (extensions.contains("compute_shader"))){
+			Log.i(TAG," compute shader");
+		}
 	}
-	
-	/**
+
+/*	/**
 	 * Return correct debug object
-	 * 
+	 *
 	 * @param gl
 	 * @return 
 	 */
-	public static GL2GL3 getDebugGL(GL2GL3 gl){
+/*	public static GL2GL3 getDebugGL(GL2GL3 gl){
 		int version = getVersionOpenGL(gl);
 		if (version < 300)
 			return new DebugGL2(gl.getGL2());
@@ -149,12 +155,12 @@ public class OGLUtils {
 
 	/**
 	 * Check GL error
-	 * 
+	 *
 	 * @param gl
 	 * @param longReport
 	 *            type of report
 	 */
-	static public void checkGLError(GL2GL3 gl, String text, boolean longReport) {
+/*	static public void checkGLError(GL2GL3 gl, String text, boolean longReport) {
 		int err = gl.glGetError();
 		String errorName, errorDesc;
 
@@ -197,10 +203,10 @@ public class OGLUtils {
 
 	/**
 	 * Empty GL error
-	 * 
+	 *
 	 * @param gl
 	 */
-	static public void emptyGLError(GL2GL3 gl) {
+	/*static public void emptyGLError(GL2GL3 gl) {
 		int err = gl.glGetError();
 		while (err != GL2GL3.GL_NO_ERROR) {
 			err = gl.glGetError();
@@ -210,20 +216,20 @@ public class OGLUtils {
 
 	/**
 	 * Check GL error
-	 * 
+	 *
 	 * @param gl
 	 */
-	static public void checkGLError(GL2GL3 gl, String text) {
+	/*static public void checkGLError(GL2GL3 gl, String text) {
 		checkGLError(gl, text, false);
 	}
 
 	/**
 	 * Check GL error
-	 * 
+	 *
 	 * @param gl
 	 */
-	static public void checkGLError(GL2GL3 gl) {
+/*	static public void checkGLError(GL2GL3 gl) {
 		checkGLError(gl, "", false);
 	}
-
+*/
 }

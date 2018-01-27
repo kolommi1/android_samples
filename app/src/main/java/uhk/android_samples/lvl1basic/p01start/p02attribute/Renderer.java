@@ -12,6 +12,8 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import uhk.android_samples.oglutils.OGLUtils;
+
 /**
  * Adding another attribute (color) to vertices via vertex buffer *
  */
@@ -19,15 +21,20 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     private int[] vertexBuffer = new int[1], indexBuffer = new int[1];
     private int shaderProgram;
+    private int maxGlEsVersion;
+
+    Renderer(int maxGlEsVersion){
+        this.maxGlEsVersion = maxGlEsVersion;
+    }
 
     @Override
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
         // barva pozadí
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        //TODO: check shader support
-        //OGLUtils.shaderCheck(gl);
-        //TODO: print GL parametres
-        //OGLUtils.printOGLparameters(gl);
+
+        OGLUtils.shaderCheck(maxGlEsVersion);
+
+        OGLUtils.printOGLparameters(maxGlEsVersion);
 
         createBuffers();
         createShaders();

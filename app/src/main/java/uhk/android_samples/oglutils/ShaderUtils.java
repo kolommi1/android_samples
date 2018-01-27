@@ -1,4 +1,4 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import com.jogamp.opengl.GL2GL3;
-import com.jogamp.opengl.GL3;
 
 public final class ShaderUtils {
 
@@ -19,13 +17,13 @@ public final class ShaderUtils {
 	public static final String TESS_EVALUATION_SHADER_EXTENSION = ".tese";
 	public static final String COMPUTE_SHADER_EXTENSION = ".comp";
 
-	public static final int VERTEX_SHADER_SUPPORT_VERSION = 120;
-	public static final int FRAGMENT_SHADER_SUPPORT_VERSION = 120;
-	public static final int GEOMETRY_SHADER_SUPPORT_VERSION = 150;
-	public static final int TESSELATION_SUPPORT_VERSION = 400;
-	public static final int COMPUTE_SHADER_SUPPORT_VERSION = 430;
+	public static final int VERTEX_SHADER_SUPPORT_VERSION = 100;
+	public static final int FRAGMENT_SHADER_SUPPORT_VERSION = 100;
+//	public static final int GEOMETRY_SHADER_SUPPORT_VERSION = ;
+//	public static final int TESSELATION_SUPPORT_VERSION = ;
+	public static final int COMPUTE_SHADER_SUPPORT_VERSION = 310;
 
-	private static final String[] SHADER_FILE_EXTENSIONS = { VERTEX_SHADER_EXTENSION, FRAGMENT_SHADER_EXTENSION,
+/*	private static final String[] SHADER_FILE_EXTENSIONS = { VERTEX_SHADER_EXTENSION, FRAGMENT_SHADER_EXTENSION,
 			GEOMETRY_SHADER_EXTENSION, TESS_CONTROL_SHADER_EXTENSION, TESS_EVALUATION_SHADER_EXTENSION,
 			COMPUTE_SHADER_EXTENSION };
 
@@ -41,7 +39,7 @@ public final class ShaderUtils {
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param vertexShaderFileName
@@ -64,7 +62,7 @@ public final class ShaderUtils {
 	 *            extension (COMPUTE_SHADER_EXTENSION) or null
 	 * @return new id of shader program
 	 */
-	public static int loadProgram(GL2GL3 gl, String vertexShaderFileName, String fragmentShaderFileName,
+/*	public static int loadProgram(GL2GL3 gl, String vertexShaderFileName, String fragmentShaderFileName,
 			String geometryShaderFileName, String tessControlShaderFileName, String tessEvaluationShaderFileName,
 			String computeShaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
@@ -79,14 +77,14 @@ public final class ShaderUtils {
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shaderFileName
 	 *            full path name of shader file without file extension
 	 * @return new id of shader program
 	 */
-	public static int loadProgram(GL2GL3 gl, String shaderFileName) {
+/*	public static int loadProgram(GL2GL3 gl, String shaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
 		for (int i = 0; i < SHADER_FILE_EXTENSIONS.length; i++)
 			shaderFileNames[i] = shaderFileName;
@@ -95,7 +93,7 @@ public final class ShaderUtils {
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shaderFileNames
@@ -105,7 +103,7 @@ public final class ShaderUtils {
 	 * 
 	 * @return new id of shader program
 	 */
-	public static int loadProgram(GL2GL3 gl, String[] shaderFileNames) {
+	/*public static int loadProgram(GL2GL3 gl, String[] shaderFileNames) {
 		if (shaderFileNames.length > SHADER_NAMES.length) {
 			System.err.println("Number of shader sources is bigger than number of shaders");
 			return -1;
@@ -137,7 +135,7 @@ public final class ShaderUtils {
 	/**
 	 * Load, create, compile, attach and link shader sources defined as arrays
 	 * of Strings
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param vertexShaderSrc
@@ -154,7 +152,7 @@ public final class ShaderUtils {
 	 *            array of Strings with GLSL code for compute shader or null
 	 * @return new id of shader program
 	 */
-	public static int loadProgram(GL2GL3 gl, String[] vertexShaderSrc, String[] fragmentShaderSrc,
+/*	public static int loadProgram(GL2GL3 gl, String[] vertexShaderSrc, String[] fragmentShaderSrc,
 			String[] geometryShaderSrc, String[] tessControlShaderSrc, String[] tessEvaluationShaderSrc,
 			String[] computeShaderSrc) {
 		String[][] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length][];
@@ -170,7 +168,7 @@ public final class ShaderUtils {
 	/**
 	 * Load, create, compile, attach and link shader sources defined as arrays
 	 * of Strings
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shaderSrcArray
@@ -179,7 +177,7 @@ public final class ShaderUtils {
 	 *            compute shader or null
 	 * @return new id of shader program
 	 */
-	public static int loadProgram(GL2GL3 gl, String[][] shaderSrcArray) {
+/*	public static int loadProgram(GL2GL3 gl, String[][] shaderSrcArray) {
 		OGLUtils.emptyGLError(gl);
 		if (shaderSrcArray.length > SHADER_NAMES.length) {
 			System.err.println("Number of shader sources is bigger than number of shaders");
@@ -254,7 +252,7 @@ public final class ShaderUtils {
 	 *            full path name to a shader file
 	 * @return array of Strings with GLSL shader code
 	 */
-	static public String[] readShaderProgram(String streamFileName) {
+	/*static public String[] readShaderProgram(String streamFileName) {
 
 		InputStream is = ShaderUtils.class.getResourceAsStream(streamFileName);
 		if (is == null) {
@@ -290,7 +288,7 @@ public final class ShaderUtils {
 	/**
 	 * Create shader and define source as array of Strings. At the end of a
 	 * String of code line is char \n added. Chars after // are deleted.
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shaderSrc
@@ -299,7 +297,7 @@ public final class ShaderUtils {
 	 *            of shader
 	 * @return new id of shader
 	 */
-	static public int createShaderProgram(GL2GL3 gl, String[] shaderSrc, int type) {
+/*	static public int createShaderProgram(GL2GL3 gl, String[] shaderSrc, int type) {
 		int shader = gl.glCreateShader(type);
 		if (shader <= 0) {
 			return shader;
@@ -323,14 +321,14 @@ public final class ShaderUtils {
 
 	/**
 	 * Compile shader
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shader
 	 *            id of shader
 	 * @return new id of shader
 	 */
-	static public int compileShaderProgram(GL2GL3 gl, int shader) {
+/*	static public int compileShaderProgram(GL2GL3 gl, int shader) {
 		String error;
 
 		gl.glCompileShader(shader);
@@ -349,14 +347,14 @@ public final class ShaderUtils {
 
 	/**
 	 * Link shader program
-	 * 
+	 *
 	 * @param gl
 	 *            GL context
 	 * @param shader
 	 *            id of shader program
 	 * @return new id of shader program
 	 */
-	static public boolean linkProgram(GL2GL3 gl, int shaderProgram) {
+/*	static public boolean linkProgram(GL2GL3 gl, int shaderProgram) {
 		String error;
 		gl.glLinkProgram(shaderProgram);
 		error = checkLogInfo(gl, shaderProgram, GL2GL3.GL_LINK_STATUS);
@@ -412,5 +410,5 @@ public final class ShaderUtils {
 		}
 		return null;
 	}
-
+*/
 }
