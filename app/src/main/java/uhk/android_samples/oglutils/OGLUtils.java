@@ -64,7 +64,7 @@ public class OGLUtils {
 	}
 
 	/**
-	 * Get supported OpenGL version
+	 * Get supported OpenGL ES version
 	 *
 	 * @param maxGlEsVersion maximum supported OpenGL ES version
 	 * @return version as integer number multiplied by 100, for OpenGL ES 3.1
@@ -86,29 +86,17 @@ public class OGLUtils {
 		return Integer.parseInt(parts[0]) * 100 + Integer.parseInt(parts[1]) * 10;
 	}
 
-/*	/**
-	 * Print parameters of current JOGL
-	 * 
-	 */
-/*	public static void printJOGLparameters() {
-		Package p = Package.getPackage("com.jogamp.opengl");
-		System.out.println("JOGL specification version: " + p.getSpecificationVersion());
-		System.out.println("JOGL implementation version: " + p.getImplementationVersion());
-		System.out.println("JOGL implementation title: " + p.getImplementationTitle());
-		System.out.println("JOGL implementation vendor: " + p.getImplementationVendor());
-	}*/
-
-/*	/**
+	/**
 	 * Print parameters of current JAVA
 	 * 
 	 */
-/*	public static void printJAVAparameters() {
-		System.out.println("Java version: " + System.getProperty("java.version"));
-		System.out.println("Java vendor: " + System.getProperty("java.vendor"));
-	}*/
+	public static void printJAVAparameters() {
+		Log.i(TAG,"Java version: " + System.getProperty("java.version"));
+		Log.i(TAG,"Java vendor: " + System.getProperty("java.vendor"));
+	}
 
 	/**
-	 * Check OpenGL shaders support
+	 * Check OpenGL ES shaders support
 	 *
 	 * @param maxGlEsVersion maximum supported OpenGL ES version
 	 */
@@ -153,39 +141,38 @@ public class OGLUtils {
 		return new DebugGL4(gl.getGL4());
 	}
 
-	/**
+*/	/**
 	 * Check GL error
 	 *
-	 * @param gl
 	 * @param longReport
 	 *            type of report
 	 */
-/*	static public void checkGLError(GL2GL3 gl, String text, boolean longReport) {
-		int err = gl.glGetError();
+	static public void checkGLError( String text, boolean longReport) {
+		int err = GLES20.glGetError();
 		String errorName, errorDesc;
 
-		while (err != GL2GL3.GL_NO_ERROR) {
+		while (err != GLES20.GL_NO_ERROR) {
 
 			switch (err) {
-			case GL2GL3.GL_INVALID_ENUM:
+			case GLES20.GL_INVALID_ENUM:
 				errorName = "GL_INVALID_ENUM";
 				errorDesc = "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.";
 				break;
 
-			case GL2GL3.GL_INVALID_VALUE:
+			case GLES20.GL_INVALID_VALUE:
 				errorName = "GL_INVALID_VALUE";
 				errorDesc = "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.";
 				break;
 
-			case GL2GL3.GL_INVALID_OPERATION:
+			case GLES20.GL_INVALID_OPERATION:
 				errorName = "GL_INVALID_OPERATION";
 				errorDesc = "The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.";
 				break;
-			case GL2GL3.GL_INVALID_FRAMEBUFFER_OPERATION:
+			case GLES20.GL_INVALID_FRAMEBUFFER_OPERATION:
 				errorName = "GL_INVALID_FRAMEBUFFER_OPERATION";
 				errorDesc = "The framebuffer object is not complete. The offending command is ignored and has no other side effect than to set the error flag.";
 				break;
-			case GL2GL3.GL_OUT_OF_MEMORY:
+			case GLES20.GL_OUT_OF_MEMORY:
 				errorName = "GL_OUT_OF_MEMORY";
 				errorDesc = "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded.";
 				break;
@@ -193,10 +180,10 @@ public class OGLUtils {
 				return;
 			}
 			if (longReport)
-				System.err.println(text + " GL error: " + err + " " + errorName + ": " + errorDesc);
+				Log.e(TAG,text + " GL error: " + err + " " + errorName + ": " + errorDesc);
 			else
-				System.err.println(text + " GL error: " + errorName);
-			err = gl.glGetError();
+				Log.e(TAG,text + " GL error: " + errorName);
+			err = GLES20.glGetError();
 		}
 
 	}
@@ -204,12 +191,11 @@ public class OGLUtils {
 	/**
 	 * Empty GL error
 	 *
-	 * @param gl
 	 */
-	/*static public void emptyGLError(GL2GL3 gl) {
-		int err = gl.glGetError();
-		while (err != GL2GL3.GL_NO_ERROR) {
-			err = gl.glGetError();
+	static public void emptyGLError() {
+		int err = GLES20.glGetError();
+		while (err != GLES20.GL_NO_ERROR) {
+			err = GLES20.glGetError();
 		}
 
 	}
@@ -217,19 +203,16 @@ public class OGLUtils {
 	/**
 	 * Check GL error
 	 *
-	 * @param gl
 	 */
-	/*static public void checkGLError(GL2GL3 gl, String text) {
-		checkGLError(gl, text, false);
+	static public void checkGLError(String text) {
+		checkGLError( text, false);
 	}
 
 	/**
 	 * Check GL error
-	 *
-	 * @param gl
 	 */
-/*	static public void checkGLError(GL2GL3 gl) {
-		checkGLError(gl, "", false);
+	static public void checkGLError() {
+		checkGLError( "", false);
 	}
-*/
+
 }

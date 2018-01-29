@@ -1,15 +1,15 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
 import java.util.List;
 
-import transforms.Col;
-import transforms.Mat3;
-import transforms.Mat4;
-import transforms.Point3D;
-import transforms.Quat;
-import transforms.Vec1D;
-import transforms.Vec2D;
-import transforms.Vec3D;
+import uhk.android_samples.transforms.Col;
+import uhk.android_samples.transforms.Mat3;
+import uhk.android_samples.transforms.Mat4;
+import uhk.android_samples.transforms.Point3D;
+import uhk.android_samples.transforms.Quat;
+import uhk.android_samples.transforms.Vec1D;
+import uhk.android_samples.transforms.Vec2D;
+import uhk.android_samples.transforms.Vec3D;
 
 
 public class ToFloatArray {

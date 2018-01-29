@@ -1,114 +1,98 @@
 package uhk.android_samples.oglutils;
 
+import android.content.Context;
+import android.opengl.GLES20;
+import android.opengl.GLES31;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 
 public final class ShaderUtils {
+	private static final String TAG = "Shaderutils";
 
 	public static final String VERTEX_SHADER_EXTENSION = ".vert";
 	public static final String FRAGMENT_SHADER_EXTENSION = ".frag";
-	public static final String GEOMETRY_SHADER_EXTENSION = ".geom";
-	public static final String TESS_CONTROL_SHADER_EXTENSION = ".tesc";
-	public static final String TESS_EVALUATION_SHADER_EXTENSION = ".tese";
 	public static final String COMPUTE_SHADER_EXTENSION = ".comp";
 
 	public static final int VERTEX_SHADER_SUPPORT_VERSION = 100;
 	public static final int FRAGMENT_SHADER_SUPPORT_VERSION = 100;
-//	public static final int GEOMETRY_SHADER_SUPPORT_VERSION = ;
-//	public static final int TESSELATION_SUPPORT_VERSION = ;
 	public static final int COMPUTE_SHADER_SUPPORT_VERSION = 310;
 
-/*	private static final String[] SHADER_FILE_EXTENSIONS = { VERTEX_SHADER_EXTENSION, FRAGMENT_SHADER_EXTENSION,
-			GEOMETRY_SHADER_EXTENSION, TESS_CONTROL_SHADER_EXTENSION, TESS_EVALUATION_SHADER_EXTENSION,
+	private static final String[] SHADER_FILE_EXTENSIONS = { VERTEX_SHADER_EXTENSION, FRAGMENT_SHADER_EXTENSION,
 			COMPUTE_SHADER_EXTENSION };
 
 	private static final int[] SHADER_SUPPORT_EXTENSIONS = { VERTEX_SHADER_SUPPORT_VERSION,
-			FRAGMENT_SHADER_SUPPORT_VERSION, GEOMETRY_SHADER_SUPPORT_VERSION, TESSELATION_SUPPORT_VERSION,
-			TESSELATION_SUPPORT_VERSION, COMPUTE_SHADER_SUPPORT_VERSION };
+			FRAGMENT_SHADER_SUPPORT_VERSION, COMPUTE_SHADER_SUPPORT_VERSION };
 
-	private static final int[] SHADER_NAME_CONSTANTS = { GL2GL3.GL_VERTEX_SHADER, GL2GL3.GL_FRAGMENT_SHADER,
-			GL3.GL_GEOMETRY_SHADER, GL3.GL_TESS_CONTROL_SHADER, GL3.GL_TESS_EVALUATION_SHADER, GL3.GL_COMPUTE_SHADER };
+	private static final int[] SHADER_NAME_CONSTANTS = { GLES20.GL_VERTEX_SHADER, GLES20.GL_FRAGMENT_SHADER, GLES31.GL_COMPUTE_SHADER };
 
-	private static final String[] SHADER_NAMES = { "Vertex", "Fragment", "Geometry", "Control", "Evaluation",
-			"Compute" };
+	private static final String[] SHADER_NAMES = { "Vertex", "Fragment", "Compute" };
+
+	private Context context;
+	private int maxGlEsVersion;
+
+	public ShaderUtils(Context context, int maxGlEsVersion){
+		this.context = context;
+		this.maxGlEsVersion = maxGlEsVersion;
+	}
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param vertexShaderFileName
 	 *            full path name of vertex shader file with/without file
 	 *            extension (VERTEX_SHADER_EXTENSION) or null
 	 * @param fragmentShaderFileName
 	 *            full path name of fragment shader file with/without file
 	 *            extension (FRAGMENT_SHADER_EXTENSION) or null
-	 * @param geometryShaderFileName
-	 *            full path name of geometry shader file with/without file
-	 *            extension (GEOMETRY_SHADER_EXTENSION) or null
-	 * @param tessControlShaderFileName
-	 *            full path name of control shader file with/without file
-	 *            extension (TESS_CONTROL_SHADER_EXTENSION) or null
-	 * @param tessEvaluationShaderFileName
-	 *            full path name of evaluation shader file with/without file
-	 *            extension (TESS_EVALUATION_SHADER_EXTENSION) or null
 	 * @param computeShaderFileName
 	 *            full path name of compute shader file with/without file
 	 *            extension (COMPUTE_SHADER_EXTENSION) or null
 	 * @return new id of shader program
 	 */
-/*	public static int loadProgram(GL2GL3 gl, String vertexShaderFileName, String fragmentShaderFileName,
-			String geometryShaderFileName, String tessControlShaderFileName, String tessEvaluationShaderFileName,
+	public int loadProgram(String vertexShaderFileName, String fragmentShaderFileName,
 			String computeShaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
 		shaderFileNames[0] = vertexShaderFileName;
 		shaderFileNames[1] = fragmentShaderFileName;
-		shaderFileNames[2] = geometryShaderFileName;
-		shaderFileNames[3] = tessControlShaderFileName;
-		shaderFileNames[4] = tessEvaluationShaderFileName;
-		shaderFileNames[5] = computeShaderFileName;
-		return loadProgram(gl, shaderFileNames);
+		shaderFileNames[2] = computeShaderFileName;
+		return loadProgram( shaderFileNames);
 	}
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param shaderFileName
 	 *            full path name of shader file without file extension
 	 * @return new id of shader program
 	 */
-/*	public static int loadProgram(GL2GL3 gl, String shaderFileName) {
+	public int loadProgram( String shaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
 		for (int i = 0; i < SHADER_FILE_EXTENSIONS.length; i++)
 			shaderFileNames[i] = shaderFileName;
-		return loadProgram(gl, shaderFileNames);
+		return loadProgram(shaderFileNames);
 	}
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param shaderFileNames
 	 *            array of full path name of shader files with/without file
-	 *            extension in order vertex, fragment, geometry, control,
-	 *            evaluation and compute shader or null
+	 *            extension in order vertex, fragment, compute shader or null
 	 * 
 	 * @return new id of shader program
 	 */
-	/*public static int loadProgram(GL2GL3 gl, String[] shaderFileNames) {
+	public int loadProgram( String[] shaderFileNames) {
 		if (shaderFileNames.length > SHADER_NAMES.length) {
-			System.err.println("Number of shader sources is bigger than number of shaders");
+			Log.e(TAG,"Number of shader sources is bigger than number of shaders");
 			return -1;
 		}
-		String[][] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length][];
+		String[] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length];
 		for (int i = 0; i < shaderFileNames.length; i++) {
 			if (shaderFileNames[i] == null)
 				continue;
@@ -118,127 +102,112 @@ public final class ShaderUtils {
 			if (index < 0) // file extension added
 				shaderFileName += SHADER_FILE_EXTENSIONS[i];
 
-			System.out.print("Shader file: " + shaderFileName + " Reading ... ");
+			Log.i(TAG,"Shader file: " + shaderFileName + " Reading ... ");
 
-			String[] shaderSrc = readShaderProgram(shaderFileName);
+			String shaderSrc = readShaderProgram(shaderFileName);
 			if (shaderSrc == null) {
 				continue;
 			} else {
-				System.out.println("OK");
+				Log.i(TAG,"OK");
 			}
 			shaderSrcArray[i] = shaderSrc;
 		}
-		;
-		return loadProgram(gl, shaderSrcArray);
+
+		return loadProgramFromSource(shaderSrcArray);
 	}
 
 	/**
-	 * Load, create, compile, attach and link shader sources defined as arrays
-	 * of Strings
+	 * Load, create, compile, attach and link shader sources defined Strings
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param vertexShaderSrc
-	 *            array of Strings with GLSL code for vertex shader or null
+	 *           String with GLSL code for vertex shader or null
 	 * @param fragmentShaderSrc
-	 *            array of Strings with GLSL code for fragment shader or null
-	 * @param geometryShaderSrc
-	 *            array of Strings with GLSL code for geometry shader or null
-	 * @param tessControlShaderSrc
-	 *            array of Strings with GLSL code for control shader or null
-	 * @param tessEvaluationShaderSrc
-	 *            array of Strings with GLSL code for evaluation shader or null
+	 *            String with GLSL code for fragment shader or null
 	 * @param computeShaderSrc
-	 *            array of Strings with GLSL code for compute shader or null
+	 *            String with GLSL code for compute shader or null
 	 * @return new id of shader program
 	 */
-/*	public static int loadProgram(GL2GL3 gl, String[] vertexShaderSrc, String[] fragmentShaderSrc,
-			String[] geometryShaderSrc, String[] tessControlShaderSrc, String[] tessEvaluationShaderSrc,
-			String[] computeShaderSrc) {
-		String[][] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length][];
+	public int loadProgramFromSource(String vertexShaderSrc, String fragmentShaderSrc,
+			String computeShaderSrc) {
+		String[] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length];
 		shaderSrcArray[0] = vertexShaderSrc;
 		shaderSrcArray[1] = fragmentShaderSrc;
-		shaderSrcArray[2] = geometryShaderSrc;
-		shaderSrcArray[3] = tessControlShaderSrc;
-		shaderSrcArray[4] = tessEvaluationShaderSrc;
-		shaderSrcArray[5] = computeShaderSrc;
-		return loadProgram(gl, shaderSrcArray);
+		shaderSrcArray[2] = computeShaderSrc;
+		return loadProgramFromSource(shaderSrcArray);
 	}
 
 	/**
-	 * Load, create, compile, attach and link shader sources defined as arrays
-	 * of Strings
-	 *
-	 * @param gl
-	 *            GL context
+	 * Load, create, compile, attach and link shader sources defined as Strings
 	 * @param shaderSrcArray
-	 *            array of arrays of Strings with GLSL codes for shaders in
-	 *            order vertex, fragment, geometry, control, evaluation and
-	 *            compute shader or null
+	 *            arrays of Strings with GLSL codes for shaders in
+	 *            order vertex, fragment, compute shader or null
 	 * @return new id of shader program
 	 */
-/*	public static int loadProgram(GL2GL3 gl, String[][] shaderSrcArray) {
-		OGLUtils.emptyGLError(gl);
+	public int loadProgramFromSource( String[] shaderSrcArray) {
+		OGLUtils.emptyGLError();
 		if (shaderSrcArray.length > SHADER_NAMES.length) {
-			System.err.println("Number of shader sources is bigger than number of shaders");
+			Log.e(TAG,"Number of shader sources is bigger than number of shaders");
 			return -1;
 		}
 
-		int shaderProgram = gl.glCreateProgram();
-		if (shaderProgram < 0) {
-			System.err.println("Unable create new shader program ");
+		int shaderProgram = GLES20.glCreateProgram();
+		if (shaderProgram == 0) {
+			Log.e(TAG,"Unable create new shader program ");
 			return -1;
 		}
-		System.out.println("New shader program '" + shaderProgram + "' created");
+		Log.i(TAG,"New shader program '" + shaderProgram + "' created");
 
 		int[] shaders = new int[shaderSrcArray.length];
 		for (int i = 0; i < shaderSrcArray.length; i++) {
 			shaders[i] = 0;
 			if (shaderSrcArray[i] == null)
 				continue;
-			System.out.print("  " + SHADER_FILE_EXTENSIONS[i].substring(1).toUpperCase() + " shader: Creating ... ");
-			if (OGLUtils.getVersionGLSL(gl) < SHADER_SUPPORT_EXTENSIONS[i]) {
-				System.err.println(SHADER_NAMES[i] + " shader extension is not supported by OpenGL driver ("
-						+ OGLUtils.getVersionGLSL(gl) + ").");
+			Log.i(TAG,"  " + SHADER_FILE_EXTENSIONS[i].substring(1).toUpperCase() + " shader: Creating ... ");
+			if (OGLUtils.getVersionGLSL(maxGlEsVersion) < SHADER_SUPPORT_EXTENSIONS[i]) {
+				Log.e(TAG, SHADER_NAMES[i] + " shader extension is not supported by OpenGL driver ("
+						+ OGLUtils.getVersionGLSL(maxGlEsVersion) + ").");
 				continue;
 			}
-			shaders[i] = createShaderProgram(gl, shaderSrcArray[i], SHADER_NAME_CONSTANTS[i]);
+			shaders[i] = createShaderProgram( shaderSrcArray[i], SHADER_NAME_CONSTANTS[i]);
 			if (shaders[i] > 0) {
-				System.out.print("'" + shaders[i] + "' OK,  ");
+				Log.i(TAG,"'" + shaders[i] + "' OK,  ");
 			} else {
-				System.err.println("Shader is not supported");
+				Log.e(TAG,"Shader is not supported");
 				continue;
 			}
 
-			System.out.print("Compiling '" + shaders[i] + "'... ");
-			shaders[i] = compileShaderProgram(gl, shaders[i]);
+			Log.i(TAG,"Compiling '" + shaders[i] + "'... ");
+			shaders[i] = compileShaderProgram( shaders[i]);
 			if (shaders[i] > 0) {
-				System.out.print("OK, ");
+				Log.i(TAG,"OK, ");
 			} else {
+
 				// Don't leak shaders either
-				gl.glDeleteShader(shaders[i]);
+				GLES20.glDeleteShader(shaders[i]);
+				shaders[i] = 0;
 				return (-1);
 			}
 
-			System.out.print("Attaching '" + shaders[i] + "' to '" + shaderProgram + "' ... ");
-			gl.glAttachShader(shaderProgram, shaders[i]);
-			System.out.println("OK, ");
+			Log.i(TAG,"Attaching '" + shaders[i] + "' to '" + shaderProgram + "' ... ");
+			GLES20.glAttachShader(shaderProgram, shaders[i]);
+			Log.i(TAG,"OK, ");
 		}
-		
-		System.out.print("  Linking shader program '" + shaderProgram + "' ... ");
-		if (linkProgram(gl, shaderProgram)) {
-			System.out.println("OK");
+
+		Log.i(TAG,"  Linking shader program '" + shaderProgram + "' ... ");
+		if (linkProgram(shaderProgram)) {
+			Log.i(TAG,"OK");
 		} else {
 			// We don't need the program anymore
-			gl.glDeleteProgram(shaderProgram);
+			GLES20.glDeleteProgram(shaderProgram);
+			shaderProgram = 0;
 		}
 
 		for (int shader : shaders) {
 			if (shader > 0) {
 				// Always detach shaders after a successful link
-				gl.glDetachShader(shaderProgram, shader);
+				GLES20.glDetachShader(shaderProgram, shader);
 				// Don't leak shader either
-				gl.glDeleteShader(shader);
+				GLES20.glDeleteShader(shader);
 			}
 		}
 
@@ -247,74 +216,75 @@ public final class ShaderUtils {
 
 	/**
 	 * Read shader code as stream from file
-	 * 
+	 * At the end of a
+	 * String of code line is char \n added. Chars after // are deleted.
+	 *
 	 * @param streamFileName
 	 *            full path name to a shader file
-	 * @return array of Strings with GLSL shader code
+	 * @return String with GLSL shader code
 	 */
-	/*static public String[] readShaderProgram(String streamFileName) {
+	public String readShaderProgram(String streamFileName) {
 
-		InputStream is = ShaderUtils.class.getResourceAsStream(streamFileName);
+		InputStream is = null;
+		try {
+			is = context.getAssets().open(streamFileName);
+		} catch (IOException e) {
+			Log.e(TAG,"File not found ");
+			e.printStackTrace();
+			return null;
+		}
 		if (is == null) {
-			System.out.println("File not found ");
+			Log.e(TAG,"File not found ");
 			return null;
 		}
 
-		BufferedReader brv = null;
+		BufferedReader bufferedReader = null;
 		try {
-			brv = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+			bufferedReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;
 		}
 
 		String line;
-		ArrayList<String> shader = new ArrayList<>();
+		final StringBuilder shader = new StringBuilder();
 		try {
-			while ((line = brv.readLine()) != null) {
-				shader.add(new String(line));
+			while ((line = bufferedReader.readLine()) != null) {
+
+				int index = line.indexOf("//");
+				if (index > 0)
+					line = line.substring(0, index);
+				index = line.indexOf("\n");
+				if (index < 0)
+					line = line + "\n";
+				shader.append(line);
 			}
 			is.close();
-			brv.close();
+			bufferedReader.close();
 		} catch (IOException e) {
-			System.err.println("Read error in ");
+			Log.e(TAG,"Read error in ");
 			e.printStackTrace();
 		}
 
-		String[] result = new String[shader.size()];
-		return shader.toArray(result);
+		return shader.toString();
 	}
 
 	/**
-	 * Create shader and define source as array of Strings. At the end of a
-	 * String of code line is char \n added. Chars after // are deleted.
+	 * Create shader and define source String.
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param shaderSrc
-	 *            array of Strings with GLSL shader code
+	 *            String with GLSL shader code
 	 * @param type
 	 *            of shader
 	 * @return new id of shader
 	 */
-/*	static public int createShaderProgram(GL2GL3 gl, String[] shaderSrc, int type) {
-		int shader = gl.glCreateShader(type);
-		if (shader <= 0) {
+	static public int createShaderProgram( String shaderSrc, int type) {
+		int shader = GLES20.glCreateShader(type);
+		if (shader == 0) {
 			return shader;
 		}
 
-		for (int i = 0; i < shaderSrc.length; i++) {
-			String line = shaderSrc[i];
-			int index = line.indexOf("//");
-			if (index > 0)
-				line = line.substring(0, index);
-			index = line.indexOf("\n");
-			if (index < 0)
-				line = new String(line + "\n");
-			shaderSrc[i] = line;
-		}
-
-		gl.glShaderSource(shader, shaderSrc.length, shaderSrc, (int[]) null, 0);
+		GLES20.glShaderSource(shader, shaderSrc);
 
 		return shader;
 	}
@@ -322,24 +292,22 @@ public final class ShaderUtils {
 	/**
 	 * Compile shader
 	 *
-	 * @param gl
-	 *            GL context
 	 * @param shader
 	 *            id of shader
 	 * @return new id of shader
 	 */
-/*	static public int compileShaderProgram(GL2GL3 gl, int shader) {
+	static public int compileShaderProgram( int shader) {
 		String error;
 
-		gl.glCompileShader(shader);
-		error = checkLogInfo(gl, shader, GL2GL3.GL_COMPILE_STATUS);
+		GLES20.glCompileShader(shader);
+		error = checkLogInfo( shader, GLES20.GL_COMPILE_STATUS);
 		if (error == null) {
 			return shader;
 		} else {
-			System.err.println("failed");
-			System.err.println("\n" + error);
+			Log.e(TAG,"failed");
+			Log.e(TAG,"\n" + error);
 			if (shader > 0)
-				gl.glDeleteShader(shader);
+				GLES20.glDeleteShader(shader);
 			return -1;
 		}
 
@@ -348,67 +316,63 @@ public final class ShaderUtils {
 	/**
 	 * Link shader program
 	 *
-	 * @param gl
-	 *            GL context
-	 * @param shader
+	 * @param shaderProgram
 	 *            id of shader program
 	 * @return new id of shader program
 	 */
-/*	static public boolean linkProgram(GL2GL3 gl, int shaderProgram) {
+	static public boolean linkProgram( int shaderProgram) {
 		String error;
-		gl.glLinkProgram(shaderProgram);
-		error = checkLogInfo(gl, shaderProgram, GL2GL3.GL_LINK_STATUS);
+		GLES20.glLinkProgram(shaderProgram);
+		error = checkLogInfo( shaderProgram, GLES20.GL_LINK_STATUS);
 		if (error == null) {
 			return true;
 		} else {
-			System.err.println("failed");
-			System.err.println("\n" + error);
+			Log.e(TAG,"failed");
+			Log.e(TAG,"\n" + error);
 			return false;
 		}
 	}
 
-	static private String checkLogInfo(GL2GL3 gl, int programObject, int mode) {
+	static private String checkLogInfo(int programObject, int mode) {
 		switch (mode) {
-		case GL2GL3.GL_COMPILE_STATUS:
-			return checkLogInfoShader(gl, programObject, mode);
-		case GL2GL3.GL_LINK_STATUS:
-		case GL2GL3.GL_VALIDATE_STATUS:
-			return checkLogInfoProgram(gl, programObject, mode);
+		case GLES20.GL_COMPILE_STATUS:
+			return checkLogInfoShader( programObject, mode);
+		case GLES20.GL_LINK_STATUS:
+		case GLES20.GL_VALIDATE_STATUS:
+			return checkLogInfoProgram(programObject, mode);
 		default:
 			return "Unsupported mode.";
 		}
 	}
 
-	static private String checkLogInfoShader(GL2GL3 gl, int programObject, int mode) {
+	static private String checkLogInfoShader( int programObject, int mode) {
 		int[] error = new int[] { -1 };
-		gl.glGetShaderiv(programObject, mode, error, 0);
-		if (error[0] != GL2GL3.GL_TRUE) {
+		GLES20.glGetShaderiv(programObject, mode, error, 0);
+		if (error[0] != GLES20.GL_TRUE) {
 			int[] len = new int[1];
-			gl.glGetShaderiv(programObject, GL2GL3.GL_INFO_LOG_LENGTH, len, 0);
+			GLES20.glGetShaderiv(programObject, GLES20.GL_INFO_LOG_LENGTH, len, 0);
 			if (len[0] == 0) {
 				return null;
 			}
-			byte[] errorMessage = new byte[len[0]];
-			gl.glGetShaderInfoLog(programObject, len[0], len, 0, errorMessage, 0);
-			return new String(errorMessage, 0, len[0]);
+
+			return GLES20.glGetShaderInfoLog(programObject);
 		}
 		return null;
 	}
 
-	static private String checkLogInfoProgram(GL2GL3 gl, int programObject, int mode) {
+	static private String checkLogInfoProgram(int programObject, int mode) {
 		int[] error = new int[] { -1 };
-		gl.glGetProgramiv(programObject, mode, error, 0);
-		if (error[0] != GL2GL3.GL_TRUE) {
+		GLES20.glGetProgramiv(programObject, mode, error, 0);
+		if (error[0] != GLES20.GL_TRUE) {
 			int[] len = new int[1];
-			gl.glGetProgramiv(programObject, GL2GL3.GL_INFO_LOG_LENGTH, len, 0);
+			GLES20.glGetProgramiv(programObject, GLES20.GL_INFO_LOG_LENGTH, len, 0);
 			if (len[0] == 0) {
 				return null;
 			}
-			byte[] errorMessage = new byte[len[0]];
-			gl.glGetProgramInfoLog(programObject, len[0], len, 0, errorMessage, 0);
-			return new String(errorMessage, 0, len[0]);
+
+			return GLES20.glGetProgramInfoLog(programObject);
 		}
 		return null;
 	}
-*/
+
 }

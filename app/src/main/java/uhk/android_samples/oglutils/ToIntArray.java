@@ -1,4 +1,4 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
 import java.util.List;
 
