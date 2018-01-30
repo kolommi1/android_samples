@@ -13,7 +13,7 @@ import java.io.UnsupportedEncodingException;
 
 
 public final class ShaderUtils {
-	private static final String TAG = "Shaderutils";
+	private static final String TAG = "OGLShaderutils";
 
 	public static final String VERTEX_SHADER_EXTENSION = ".vert";
 	public static final String FRAGMENT_SHADER_EXTENSION = ".frag";
