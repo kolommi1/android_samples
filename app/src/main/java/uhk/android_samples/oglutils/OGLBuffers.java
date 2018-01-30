@@ -1,12 +1,15 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
+import android.opengl.GLES20;
+import android.util.Log;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jogamp.opengl.GL2GL3;
-import com.jogamp.common.nio.Buffers;
 
 public class OGLBuffers {
 	static public class Attrib {
@@ -51,26 +54,20 @@ public class OGLBuffers {
 		}
 	}
 
-	protected GL2GL3 gl;
 	protected List<VertexBuffer> vertexBuffers = new ArrayList<>();
 	protected List<Integer> attribArrays = null;
 	protected int[] indexBuffer;
 	protected int indexCount = -1;
 	protected int vertexCount = -1;
+	private static final String TAG = "OGLbuffers";
 
-	public OGLBuffers(GL2GL3 gl) {
-		this.gl = gl;
-	}
-
-	public OGLBuffers(GL2GL3 gl, float[] vertexData, Attrib[] attributes, int[] indexData) {
-		this.gl = gl;
+	public OGLBuffers(float[] vertexData, Attrib[] attributes, short[] indexData) {
 		addVertexBuffer(vertexData, attributes);
 		if (indexData != null)
 			setIndexBuffer(indexData);
 	}
 
-	public OGLBuffers(GL2GL3 gl, float[] vertexData, int floatsPerVertex, Attrib[] attributes, int[] indexData) {
-		this.gl = gl;
+	public OGLBuffers( float[] vertexData, int floatsPerVertex, Attrib[] attributes, short[] indexData) {
 		addVertexBuffer(vertexData, floatsPerVertex, attributes);
 		if (indexData != null)
 			setIndexBuffer(indexData);
@@ -89,10 +86,14 @@ public class OGLBuffers {
 
 	public void addVertexBuffer(float[] data, int floatsPerVertex, Attrib[] attributes) {
 		int[] bufferID = new int[1];
-		FloatBuffer buffer = Buffers.newDirectFloatBuffer(data);
-		gl.glGenBuffers(1, bufferID, 0);
-		gl.glBindBuffer(GL2GL3.GL_ARRAY_BUFFER, bufferID[0]);
-		gl.glBufferData(GL2GL3.GL_ARRAY_BUFFER, data.length * 4, buffer, GL2GL3.GL_STATIC_DRAW);
+		FloatBuffer buffer = ByteBuffer.allocateDirect(data.length * 4)
+				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+		buffer.put(data);
+		buffer.position(0);
+
+		GLES20.glGenBuffers(1, bufferID, 0);
+		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, bufferID[0]);
+		GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, data.length * 4, buffer, GLES20.GL_STATIC_DRAW);
 
 		if (data.length % floatsPerVertex != 0)
 			throw new RuntimeException(
@@ -100,34 +101,38 @@ public class OGLBuffers {
 		if (vertexCount < 0)
 			vertexCount = data.length / floatsPerVertex;
 		else if (vertexCount != data.length / floatsPerVertex)
-			System.out.println("Warning: GLBuffers.addVertexBuffer: vertex count differs from the first one.");
+			Log.w(TAG,"Warning: GLBuffers.addVertexBuffer: vertex count differs from the first one.");
 
 		vertexBuffers.add(new VertexBuffer(bufferID[0], floatsPerVertex * 4, attributes));
 	}
 
-	public void setIndexBuffer(int[] data) {
+	public void setIndexBuffer(short[] data) {
 		indexBuffer = new int[1];
 		indexCount = data.length;
-		IntBuffer buffer = Buffers.newDirectIntBuffer(data);
-		gl.glGenBuffers(1, indexBuffer, 0);
-		gl.glBindBuffer(GL2GL3.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
-		gl.glBufferData(GL2GL3.GL_ELEMENT_ARRAY_BUFFER, data.length * 4, buffer, GL2GL3.GL_STATIC_DRAW);
+		ShortBuffer buffer = ByteBuffer.allocateDirect(data.length * 2)
+				.order(ByteOrder.nativeOrder()).asShortBuffer();
+		buffer.put(data);
+		buffer.position(0);
+
+		GLES20.glGenBuffers(1, indexBuffer, 0);
+		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
+		GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, data.length * 2, buffer, GLES20.GL_STATIC_DRAW);
 	}
 
 	public void bind(int shaderProgram) {
 		if (attribArrays != null)
 			for (Integer attrib : attribArrays)
-				gl.glDisableVertexAttribArray(attrib);
+				GLES20.glDisableVertexAttribArray(attrib);
 		attribArrays = new ArrayList<>();
 		for (VertexBuffer vb : vertexBuffers) {
-			gl.glBindBuffer(GL2GL3.GL_ARRAY_BUFFER, vb.id);
+			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vb.id);
 			int offset = 0;
 			for (int j = 0; j < vb.attributes.length; j++) {
-				int location = gl.glGetAttribLocation(shaderProgram, vb.attributes[j].name);
+				int location = GLES20.glGetAttribLocation(shaderProgram, vb.attributes[j].name);
 				if (location >= 0) {// due to optimization GLSL on a graphic card
 					attribArrays.add(location);
-					gl.glEnableVertexAttribArray(location);
-					gl.glVertexAttribPointer(location, vb.attributes[j].dimension, GL2GL3.GL_FLOAT,
+					GLES20.glEnableVertexAttribArray(location);
+					GLES20.glVertexAttribPointer(location, vb.attributes[j].dimension, GLES20.GL_FLOAT,
 							vb.attributes[j].normalize, vb.stride,
 							vb.attributes[j].offset < 0 ? offset : vb.attributes[j].offset);
 				}
@@ -136,25 +141,28 @@ public class OGLBuffers {
 		}
 
 		if (indexBuffer != null)
-			gl.glBindBuffer(GL2GL3.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
+			GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
 
 	}
 
 	public void unbind() {
 		if (attribArrays != null) {
 			for (Integer attrib : attribArrays)
-				gl.glDisableVertexAttribArray(attrib);
+				GLES20.glDisableVertexAttribArray(attrib);
 			attribArrays = null;
 		}
+		//unbind from the buffers
+		GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+		GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	public void draw(int topology, int shaderProgram) {
 		// gl.glUseProgram(shaderProgram);
 		bind(shaderProgram);
 		if (indexBuffer == null) {
-			gl.glDrawArrays(topology, 0, vertexCount);
+			GLES20.glDrawArrays(topology, 0, vertexCount);
 		} else {
-			gl.glDrawElements(topology, indexCount, GL2GL3.GL_UNSIGNED_INT, 0);
+			GLES20.glDrawElements(topology, indexCount, GLES20.GL_UNSIGNED_SHORT, 0);
 		}
 		unbind();
 	}
@@ -167,21 +175,11 @@ public class OGLBuffers {
 		// gl.glUseProgram(shaderProgram);
 		bind(shaderProgram);
 		if (indexBuffer == null) {
-			gl.glDrawArrays(topology, start, count);
+			GLES20.glDrawArrays(topology, start, count);
 		} else {
-			gl.glDrawElements(topology, count, GL2GL3.GL_UNSIGNED_INT, start * 4);
+			GLES20.glDrawElements(topology, count, GLES20.GL_UNSIGNED_SHORT, start * 4);
 		}
 		unbind();
 	}
 
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-		if (indexBuffer != null)
-			gl.glDeleteBuffers(1, indexBuffer, 0);
-		int[] bufferIDs = new int[vertexBuffers.size()];
-		for (int i = 0; i < vertexBuffers.size(); i++)
-			bufferIDs[i] = vertexBuffers.get(i).id;
-		gl.glDeleteBuffers(vertexBuffers.size(), bufferIDs, 0);
-	}
 }
