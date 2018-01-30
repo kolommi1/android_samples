@@ -4,14 +4,10 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import uhk.android_samples.oglutils.OGLBuffers;
 import uhk.android_samples.oglutils.OGLUtils;
 import uhk.android_samples.oglutils.ShaderUtils;
 
@@ -23,10 +19,13 @@ import uhk.android_samples.oglutils.ShaderUtils;
  */
 public class Renderer implements GLSurfaceView.Renderer {
 
-    private int[] vertexBuffer = new int[1], indexBuffer = new int[1];
-    private int shaderProgram, locTime;
     private int maxGlEsVersion;
     private Context context;
+
+    private OGLBuffers buffers;
+
+    private int shaderProgram, locTime;
+
     private float time = 0;
 
     Renderer(Context context, int maxGlEsVersion){
@@ -55,7 +54,6 @@ public class Renderer implements GLSurfaceView.Renderer {
         //shorter version of loading shader program
         //shaderProgram = shaderUtils.loadProgram("shaders/lvl1basic/p01start/p04utils/start");
 
-        //TODO: manage buffers with OGLutils
         createBuffers();
 
 
@@ -79,63 +77,39 @@ public class Renderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(shaderProgram);
         time += 0.1;
         GLES20.glUniform1f(locTime, time); // correct shader must be set before this
-        bindBuffers();
 
-        // draw - MODE(triangles), number of vertexes, type of vertexes, location of indices
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 3, GLES20.GL_UNSIGNED_SHORT, 0);
+        // bind and draw
+        buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
 
-        //unbind from the buffers
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     private void createBuffers(){
-        // create and fill vertex buffer data
         float[] vertexBufferData = {
             -1, -1, 	0.7f, 0, 0,
             1,  0,		0, 0.7f, 0,
             0,  1,		0, 0, 0.7f
         };
-        // create buffer required for sending data to a native library
-        FloatBuffer vertexBufferBuffer = ByteBuffer.allocateDirect(vertexBufferData.length * 4)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        vertexBufferBuffer.put(vertexBufferData);
-        vertexBufferBuffer.position(0);
-
-        GLES20.glGenBuffers(1, vertexBuffer, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBuffer[0]);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexBufferData.length * 4,
-                vertexBufferBuffer, GLES20.GL_STATIC_DRAW);
-
-        // create and fill index buffer data (element buffer in OpenGL terminology)
         short[] indexBufferData = { 0, 1, 2 };
-        // create buffer required for sending data to a native library
-        ShortBuffer indexBufferBuffer = ByteBuffer.allocateDirect(indexBufferData.length * 2)
-                .order(ByteOrder.nativeOrder()).asShortBuffer();
-        indexBufferBuffer.put(indexBufferData);
-        indexBufferBuffer.position(0);
 
-        GLES20.glGenBuffers(1, indexBuffer, 0);
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
-        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER,indexBufferData.length * 2,
-                indexBufferBuffer, GLES20.GL_STATIC_DRAW);
-    }
+        // vertex binding description, concise version
+        OGLBuffers.Attrib[] attributes = {
+                new OGLBuffers.Attrib("inPosition", 2), // 2 floats
+                new OGLBuffers.Attrib("inColor", 3) // 3 floats
+        };
+        buffers = new OGLBuffers(vertexBufferData, attributes,
+                indexBufferData);
+        // the concise version requires attributes to be in this order within
+        // vertex and to be exactly all floats within vertex
 
-    private void bindBuffers() {
-        // internal OpenGL ID of a vertex shader input variable
-        int locPosition = GLES20.glGetAttribLocation(shaderProgram, "inPosition");
-        int locColor = GLES20.glGetAttribLocation(shaderProgram, "inColor");
+/*		full version for the case that some floats of the vertex are to be ignored
+ * 		(in this case it is equivalent to the concise version):
+ 		OGLBuffers.Attrib[] attributes = {
+				new OGLBuffers.Attrib("inPosition", 2, 0), // 2 floats, at 0 floats from vertex start
+				new OGLBuffers.Attrib("inColor", 3, 2) }; // 3 floats, at 2 floats from vertex start
+		buffers = new OGLBuffers( vertexBufferData, 5, // 5 floats altogether in a vertex
+				attributes, indexBufferData);
+*/
 
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vertexBuffer[0]);
-        GLES20.glEnableVertexAttribArray(locPosition);
-        // shader variable ID, number of components, type of components,
-        // normalize?, size of a vertex in bytes, location of first component
-        GLES20.glVertexAttribPointer(locPosition, 2, GLES20.GL_FLOAT, false, 20, 0);
-        GLES20.glEnableVertexAttribArray(locColor);
-        // color information starts at 0 + 8(position) = 8
-        GLES20.glVertexAttribPointer(locColor, 3, GLES20.GL_FLOAT, false, 20, 8);
-
-        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, indexBuffer[0]);
     }
 
 }
