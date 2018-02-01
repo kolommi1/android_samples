@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainLayout"
-    tools:context="uhk.android_samples.lvl1basic.p00.p01buffer.MainActivity">
+    android:id="@+id/mainLayout">
 
+    <uhk.android_samples.lvl1basic.p02geometry.p01cube.MyGLSurfaceView
+        android:id="@+id/mySurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"> </uhk.android_samples.lvl1basic.p02geometry.p01cube.MyGLSurfaceView>
 
 </RelativeLayout>

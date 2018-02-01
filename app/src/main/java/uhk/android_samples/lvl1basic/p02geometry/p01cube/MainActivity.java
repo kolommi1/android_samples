@@ -5,6 +5,12 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+import uhk.android_samples.R;
 
 public class MainActivity extends Activity {
 
@@ -14,7 +20,10 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sample_GL_View = new MyGLSurfaceView(this);
+        setContentView(R.layout.activity_main);
+        sample_GL_View = findViewById(R.id.mySurfaceView);
+
+        addButtonsToRelativeLayout(findViewById(R.id.mainLayout));
 
         // Check if the system supports OpenGL ES 2.0.
         final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -44,7 +53,6 @@ public class MainActivity extends Activity {
             throw new RuntimeException("Device does not support OpenGL ES 2.0");
         }
 
-        setContentView(sample_GL_View);
     }
 
     @Override
@@ -61,5 +69,70 @@ public class MainActivity extends Activity {
         // The activity must call the GL surface view's onPause() on activity onPause().
         super.onPause();
         sample_GL_View.onPause();
+    }
+
+    private void addButtonsToRelativeLayout(RelativeLayout layout ){
+        //Button down
+        Button downButton = new Button(this);
+        downButton.setText("\\/");
+        downButton.setId(R.id.btn_down);
+        // set parametres for xml file
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        downButton.setLayoutParams(params);
+        // attach listener
+        downButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(downButton);
+
+
+        //Button left
+        Button leftButton = new Button(this);
+        leftButton.setText("<");
+        leftButton.setId(R.id.btn_left);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.LEFT_OF, R.id.btn_down);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        leftButton.setLayoutParams(params);
+
+        leftButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(leftButton);
+
+
+        //Button right
+        Button rightButton = new Button(this);
+        rightButton.setText(">");
+        rightButton.setId(R.id.btn_right);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.RIGHT_OF, R.id.btn_down);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        rightButton.setLayoutParams(params);
+
+        rightButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(rightButton);
+
+
+        //Button up
+        Button upButton = new Button(this);
+        upButton.setText("/\\");
+        upButton.setId(R.id.btn_up);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ABOVE, R.id.btn_down);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        upButton.setLayoutParams(params);
+
+        upButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(upButton);
     }
 }

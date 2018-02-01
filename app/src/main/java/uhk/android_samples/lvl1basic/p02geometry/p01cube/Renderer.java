@@ -145,14 +145,27 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
 
     /**
-     *
      * @param tx coordinate X from touchEvent
      * @param ty coordinate Y from touchEvent
      * @param ox coordinate X from previous touchEvent
      * @param oy coordinate Y from previous touchEvent
      */
-   public void rotateCamera(float tx,float ty,float ox,float oy){
+    public void rotateCamera(float tx,float ty,float ox,float oy){
        cam = cam.addAzimuth((double) Math.PI * (ox - tx) / width)
                .addZenith((double) -Math.PI * (ty - oy) / height);
-   }
+    }
+
+    public void moveCameraForward(){
+        cam = cam.forward(1);
+    }
+    public void moveCameraBack(){
+        cam = cam.backward(1);
+    }
+    public void moveCameraLeft(){
+        cam = cam.left(1);
+    }
+    public void moveCameraRight(){
+        cam = cam.right(1);
+    }
+
 }

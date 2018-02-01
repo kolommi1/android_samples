@@ -4,6 +4,9 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
+
+import uhk.android_samples.R;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
@@ -51,5 +54,32 @@ public class MyGLSurfaceView extends GLSurfaceView {
             return super.onTouchEvent(e);
         }
     }
+
+    /**
+     * Listener for all buttons
+     */
+    public OnClickListener buttonListener = new OnClickListener() {
+        public void onClick(View v) {
+            final int id = v.getId();
+
+            if(id == R.id.btn_left){
+                renderer.moveCameraLeft();
+            }
+            if(id == R.id.btn_right){
+                renderer.moveCameraRight();
+            }
+            if(id == R.id.btn_up){
+                renderer.moveCameraForward();
+            }
+            if(id == R.id.btn_down){
+                renderer.moveCameraBack();
+            }
+
+            //TODO: cam = cam.withFirstPerson(!cam.getFirstPerson());
+
+            //TODO: cam = cam.mulRadius(0.9f);
+            //TODO: cam = cam.mulRadius(1.1f);
+        }
+    };
 
 }
