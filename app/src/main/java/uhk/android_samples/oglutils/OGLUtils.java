@@ -130,7 +130,7 @@ public class OGLUtils {
 	 * Return correct debug object
 	 *
 	 * @param gl
-	 * @return 
+	 * @return
 	 */
 /*	public static GL2GL3 getDebugGL(GL2GL3 gl){
 		int version = getVersionOpenGL(gl);
