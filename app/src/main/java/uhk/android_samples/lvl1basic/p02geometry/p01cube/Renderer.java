@@ -60,7 +60,6 @@ public class Renderer implements GLSurfaceView.Renderer {
                         .withAzimuth(Math.PI * 1.25)
                         .withZenith(Math.PI * -0.125);
 
-        //TODO: move camera with GUI buttons
         //enable depth test
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
     }
@@ -166,6 +165,14 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
     public void moveCameraRight(){
         cam = cam.right(1);
+    }
+
+    public void cameraChangeRadius(float radiusMultiplier){
+        cam = cam.mulRadius(radiusMultiplier);
+    }
+
+    public void cameraToggleFirstPerson(){
+        cam = cam.withFirstPerson(!cam.getFirstPerson());
     }
 
 }

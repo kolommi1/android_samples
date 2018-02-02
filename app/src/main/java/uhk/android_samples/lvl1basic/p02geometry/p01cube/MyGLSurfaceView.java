@@ -74,11 +74,16 @@ public class MyGLSurfaceView extends GLSurfaceView {
             if(id == R.id.btn_down){
                 renderer.moveCameraBack();
             }
+            if(id == R.id.btn_minus){
+                renderer.cameraChangeRadius(1.1f);
+            }
+            if(id == R.id.btn_plus){
+                renderer.cameraChangeRadius(0.9f);
+            }
+            if(id == R.id.btn_firstPerson){
+                renderer.cameraToggleFirstPerson();
+            }
 
-            //TODO: cam = cam.withFirstPerson(!cam.getFirstPerson());
-
-            //TODO: cam = cam.mulRadius(0.9f);
-            //TODO: cam = cam.mulRadius(1.1f);
         }
     };
 

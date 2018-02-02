@@ -5,9 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import uhk.android_samples.R;
@@ -75,8 +73,9 @@ public class MainActivity extends Activity {
         //Button down
         Button downButton = new Button(this);
         downButton.setText("\\/");
+        // file: /src/main/res/values/ids.xml - help file - can be filled with needed ids
         downButton.setId(R.id.btn_down);
-        // set parametres for xml file
+        // set parameters for xml file
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -134,5 +133,51 @@ public class MainActivity extends Activity {
 
         upButton.setOnClickListener(sample_GL_View.buttonListener);
         layout.addView(upButton);
+
+
+        //Button plus
+        Button plusButton = new Button(this);
+        plusButton.setText("+");
+        plusButton.setId(R.id.btn_plus);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        plusButton.setLayoutParams(params);
+
+        plusButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(plusButton);
+
+        //Button plus
+        Button minusButton = new Button(this);
+        minusButton.setText("-");
+        minusButton.setId(R.id.btn_minus);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        params.addRule(RelativeLayout.BELOW, R.id.btn_plus);
+        minusButton.setLayoutParams(params);
+
+        minusButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(minusButton);
+
+        //Button First person
+        Button perspectiveButton = new Button(this);
+        perspectiveButton.setText(R.string.btn_first);
+        perspectiveButton.setId(R.id.btn_firstPerson);
+
+        params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        perspectiveButton.setLayoutParams(params);
+
+        perspectiveButton.setOnClickListener(sample_GL_View.buttonListener);
+        layout.addView(perspectiveButton);
     }
 }
