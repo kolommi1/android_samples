@@ -7,4 +7,6 @@
     <item type="id" name="btn_plus" />
     <item type="id" name="btn_minus" />
     <item type="id" name="btn_firstPerson" />
+    <item type="id" name="btn_polygons" />
+    <item type="id" name="btn_mode" />
 </resources>
