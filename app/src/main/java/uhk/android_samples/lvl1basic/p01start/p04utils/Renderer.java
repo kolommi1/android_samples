@@ -47,8 +47,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         //TODO: print text with OGLutils - render text to texture, render texture
 
-        ShaderUtils shaderUtils = new ShaderUtils(context, maxGlEsVersion);
-        shaderProgram = shaderUtils.loadProgram("shaders/lvl1basic/p01start/p04utils/start.vert",
+        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,"shaders/lvl1basic/p01start/p04utils/start.vert",
                         "shaders/lvl1basic/p01start/p04utils/start.frag",null);
 
         //shorter version of loading shader program

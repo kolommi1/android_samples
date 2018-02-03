@@ -58,11 +58,10 @@ public class Renderer implements GLSurfaceView.Renderer {
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        ShaderUtils shaderUtils = new ShaderUtils(context, maxGlEsVersion);
         if (OGLUtils.getVersionGLSL(maxGlEsVersion)<300)
-            shaderProgram = shaderUtils.loadProgram( "shaders/lvl1basic/p03texture/p01intro/textureOld");
+            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/textureOld");
         else
-            shaderProgram = shaderUtils.loadProgram( "shaders/lvl1basic/p03texture/p01intro/texture");
+            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/texture");
 
         createBuffers();
 
@@ -232,6 +231,12 @@ public class Renderer implements GLSurfaceView.Renderer {
             GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
             // data from bitmap has been loaded to OpenGL, bitmap memory can be released
+            try {
+                is.close();
+            } catch (IOException e) {
+                Log.e("Textures","Read error");
+                e.printStackTrace();
+            }
             bitmap.recycle();
         }
 

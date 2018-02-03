@@ -56,9 +56,8 @@ public class Renderer implements GLSurfaceView.Renderer {
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        ShaderUtils shaderUtils = new ShaderUtils(context, maxGlEsVersion);
-        shaderProgram = shaderUtils.loadProgram( "shaders/lvl1basic/p02geometry/p03obj/ducky");
-        //shaderProgram = shaderUtils.loadProgram( "shaders/lvl1basic/p02geometry/p03obj/teapot");
+        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/ducky");
+        //shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/teapot");
 
         // obj files are in  /assets/objects/...
         model = new OGLModelOBJ(context, "objects/ducky.obj");

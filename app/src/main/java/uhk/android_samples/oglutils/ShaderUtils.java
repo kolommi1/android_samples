@@ -33,13 +33,6 @@ public final class ShaderUtils {
 
 	private static final String[] SHADER_NAMES = { "Vertex", "Fragment", "Compute" };
 
-	private Context context;
-	private int maxGlEsVersion;
-
-	public ShaderUtils(Context context, int maxGlEsVersion){
-		this.context = context;
-		this.maxGlEsVersion = maxGlEsVersion;
-	}
 
 	/**
 	 * Load, create, compile, attach and link shader sources defined as files
@@ -55,13 +48,13 @@ public final class ShaderUtils {
 	 *            extension (COMPUTE_SHADER_EXTENSION) or null
 	 * @return new id of shader program
 	 */
-	public int loadProgram(String vertexShaderFileName, String fragmentShaderFileName,
+	public static int loadProgram(Context context, int maxGlEsVersion, String vertexShaderFileName, String fragmentShaderFileName,
 			String computeShaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
 		shaderFileNames[0] = vertexShaderFileName;
 		shaderFileNames[1] = fragmentShaderFileName;
 		shaderFileNames[2] = computeShaderFileName;
-		return loadProgram( shaderFileNames);
+		return loadProgram(context, maxGlEsVersion, shaderFileNames);
 	}
 
 	/**
@@ -71,11 +64,11 @@ public final class ShaderUtils {
 	 *            full path name of shader file without file extension
 	 * @return new id of shader program
 	 */
-	public int loadProgram( String shaderFileName) {
+	public static int loadProgram(Context context, int maxGlEsVersion, String shaderFileName) {
 		String[] shaderFileNames = new String[SHADER_FILE_EXTENSIONS.length];
 		for (int i = 0; i < SHADER_FILE_EXTENSIONS.length; i++)
 			shaderFileNames[i] = shaderFileName;
-		return loadProgram(shaderFileNames);
+		return loadProgram(context, maxGlEsVersion, shaderFileNames);
 	}
 
 	/**
@@ -87,7 +80,7 @@ public final class ShaderUtils {
 	 * 
 	 * @return new id of shader program
 	 */
-	public int loadProgram( String[] shaderFileNames) {
+	public static int loadProgram(Context context, int maxGlEsVersion, String[] shaderFileNames) {
 		if (shaderFileNames.length > SHADER_NAMES.length) {
 			Log.e(TAG,"Number of shader sources is bigger than number of shaders");
 			return -1;
@@ -104,7 +97,7 @@ public final class ShaderUtils {
 
 			Log.i(TAG,"Shader file: " + shaderFileName + " Reading ... ");
 
-			String shaderSrc = readShaderProgram(shaderFileName);
+			String shaderSrc = readShaderProgram(context, shaderFileName);
 			if (shaderSrc == null) {
 				continue;
 			} else {
@@ -113,7 +106,7 @@ public final class ShaderUtils {
 			shaderSrcArray[i] = shaderSrc;
 		}
 
-		return loadProgramFromSource(shaderSrcArray);
+		return loadProgramFromSource(maxGlEsVersion, shaderSrcArray);
 	}
 
 	/**
@@ -127,13 +120,13 @@ public final class ShaderUtils {
 	 *            String with GLSL code for compute shader or null
 	 * @return new id of shader program
 	 */
-	public int loadProgramFromSource(String vertexShaderSrc, String fragmentShaderSrc,
+	public static int loadProgramFromSource(int maxGlEsVersion, String vertexShaderSrc, String fragmentShaderSrc,
 			String computeShaderSrc) {
 		String[] shaderSrcArray = new String[SHADER_FILE_EXTENSIONS.length];
 		shaderSrcArray[0] = vertexShaderSrc;
 		shaderSrcArray[1] = fragmentShaderSrc;
 		shaderSrcArray[2] = computeShaderSrc;
-		return loadProgramFromSource(shaderSrcArray);
+		return loadProgramFromSource(maxGlEsVersion, shaderSrcArray);
 	}
 
 	/**
@@ -143,7 +136,7 @@ public final class ShaderUtils {
 	 *            order vertex, fragment, compute shader or null
 	 * @return new id of shader program
 	 */
-	public int loadProgramFromSource( String[] shaderSrcArray) {
+	public static int loadProgramFromSource(int maxGlEsVersion, String[] shaderSrcArray) {
 		OGLUtils.emptyGLError();
 		if (shaderSrcArray.length > SHADER_NAMES.length) {
 			Log.e(TAG,"Number of shader sources is bigger than number of shaders");
@@ -223,7 +216,7 @@ public final class ShaderUtils {
 	 *            full path name to a shader file
 	 * @return String with GLSL shader code
 	 */
-	public String readShaderProgram(String streamFileName) {
+	public static String readShaderProgram(Context context, String streamFileName) {
 
 		InputStream is = null;
 		try {

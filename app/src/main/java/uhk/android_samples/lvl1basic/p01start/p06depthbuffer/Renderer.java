@@ -43,9 +43,8 @@ public class Renderer implements GLSurfaceView.Renderer {
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        ShaderUtils shaderUtils = new ShaderUtils(context, maxGlEsVersion);
-        shaderProgram = shaderUtils.loadProgram( "shaders/lvl1basic/p01start/p06depthbuffer/start");
-        shaderProgram2 = shaderUtils.loadProgram( "shaders/lvl1basic/p01start/p06depthbuffer/start2");
+        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p01start/p06depthbuffer/start");
+        shaderProgram2 = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p01start/p06depthbuffer/start2");
         createBuffers();
 
         locTime = GLES20.glGetUniformLocation(shaderProgram, "time");
