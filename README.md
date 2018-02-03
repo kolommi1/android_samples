@@ -18,3 +18,5 @@ Je nutné změnit balíček GLSurfaceView prvku ->
 Shadery jsou umístěny ve složce "android_samples/app/src/main/assets/shaders/"
 
 3D objekty jsou umístěny ve složce "android_samples/app/src/main/assets/objects"
+
+Textury jsou umístěny ve složce "android_samples/app/src/main/assets/textures"
