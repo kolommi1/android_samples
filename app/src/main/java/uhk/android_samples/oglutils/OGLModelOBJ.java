@@ -181,18 +181,6 @@ public class OGLModelOBJ {
 
 			private void setFaceRenderType() {
 				topology = GLES20.GL_TRIANGLES;
-				/*final int temp[] = (int[]) fv.get(0);
-
-				if (temp.length == 3) {
-					topology = GLES20.GL_TRIANGLES;
-					// The faces come in sets of 3 so we have triangular faces
-				} else if (temp.length == 4) {
-					topology = GLES20.GL_QUADS;
-					// The faces come in sets of 4 so we have quadrilateral faces
-				} else {
-					topology = GLES20.GL_POLYGON;
-					// Fall back to render as free form polygons
-				}*/
 			}
 
 		}
