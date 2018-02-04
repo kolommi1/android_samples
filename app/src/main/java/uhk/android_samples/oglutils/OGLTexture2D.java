@@ -1,295 +1,211 @@
-package oglutils;
+package uhk.android_samples.oglutils;
 
 
-import transforms.Mat4Scale;
-import transforms.Mat4Transl;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
+import android.opengl.GLUtils;
+import android.util.Log;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
-import java.nio.IntBuffer;
 
-import com.jogamp.opengl.GL2GL3;
-import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.util.texture.TextureData;
-import com.jogamp.opengl.util.texture.TextureIO;
+import uhk.android_samples.transforms.Mat4Scale;
+import uhk.android_samples.transforms.Mat4Transl;
 
-public class OGLTexture2D implements OGLTexture {
-	private final GL2GL3 gl;
+public class OGLTexture2D implements OGLTexture{
 	private final int[] textureID = new int[1];
-	private final int width, height;
-	
-	public static class Viewer implements OGLTexture.Viewer {
-		protected final GL2GL3 gl;
-		protected final int shaderProgram;
-		protected final OGLBuffers buffers;
-		protected final int locMat;
-		protected final int locLevel;
-		
-		private static final String[] SHADER_VERT_SRC = {
-				"#version 330\n",
-				"in vec2 inPosition;", 
-				"in vec2 inTexCoord;", 
-				"uniform mat4 matTrans;",
-				"out vec2 texCoords;", 
-				"void main() {",
-				"	gl_Position = matTrans * vec4(inPosition , 0.0f, 1.0f);",
-				"   texCoords = inTexCoord;",
-				"}"
-			};
-		
-		private static final String[] SHADER_FRAG_SRC = { 
-				"#version 330\n",
-				"in vec2 texCoords;", 
-				"out vec4 fragColor;", 
-				"uniform sampler2D drawTexture;",
-				"uniform int level;",
-				"void main() {",
-				" 	fragColor = texture(drawTexture, texCoords);", 
-				" 	if (level >= 0)", 
-				" 		fragColor = textureLod(drawTexture, texCoords, level);", 
-				"}" 
-			};
+    private final int width, height;
+	private static final String TAG = "OGLTexture2D";
 
-		private OGLBuffers createBuffers(GL2GL3 gl) {
-			float[] vertexBufferData = { 
-					0, 0, 0, 0, 
-					1, 0, 1, 0, 
-					0, 1, 0, 1,
-					1, 1, 1, 1 };
-			int[] indexBufferData = { 0, 1, 2, 3 };
+    public static class Viewer implements OGLTexture.Viewer {
+        protected final int shaderProgram;
+        protected final OGLBuffers buffers;
+        protected final int locMat;
+        protected final int locLevel;
 
-			OGLBuffers.Attrib[] attributes = { new OGLBuffers.Attrib("inPosition", 2),
-					new OGLBuffers.Attrib("inTexCoord", 2) };
+        private static final String SHADER_VERT_SRC =
+                "#version 300 es\n"+
+                "in vec2 inPosition;"+
+                "in vec2 inTexCoord;"+
+                "uniform mat4 matTrans;"+
+                "out vec2 texCoords;"+
+                "void main() {"+
+                "	gl_Position = matTrans * vec4(inPosition , 0.0, 1.0);"+
+                "   texCoords = inTexCoord;"+
+                "}"
+        ;
 
-			return new OGLBuffers(gl, vertexBufferData, attributes, indexBufferData);
-		}
+        private static final String SHADER_FRAG_SRC =
+                "#version 300 es\n"+
+                "precision mediump float;"+
+                "in vec2 texCoords;"+
+                "out vec4 fragColor;"+
+                "uniform sampler2D drawTexture;"+
+                "uniform int level;"+
+                "void main() {"+
+                " 	fragColor = texture(drawTexture, texCoords);"+
+                " 	if (level >= 0)"+
+                " 		fragColor = textureLod(drawTexture, texCoords, level);"+
+                "}"
+        ;
 
-		public Viewer(GL2GL3 gl) {
-			this(gl, ShaderUtils.loadProgram(gl, SHADER_VERT_SRC, SHADER_FRAG_SRC, null, null, null, null));
-		}
-		
-		protected Viewer(GL2GL3 gl, int shaderProgram) {
-			this.gl = gl;
-			buffers = createBuffers(gl);
-			this.shaderProgram = shaderProgram; 
-			locMat = this.gl.glGetUniformLocation(shaderProgram, "matTrans");
-			locLevel = this.gl.glGetUniformLocation(shaderProgram, "level");
-		}
+        private static final String oldSHADER_VERT_SRC =
+                "attribute vec2 inPosition;"+
+                "attribute vec2 inTexCoord;"+
+                "uniform mat4 matTrans;"+
+                "varying vec2 texCoords;"+
+                "void main() {"+
+                "	gl_Position = matTrans * vec4(inPosition , 0.0, 1.0);"+
+                "   texCoords = inTexCoord;"+
+                "}"
+        ;
 
-		@Override
-		public void view(int textureID) {
-			view(textureID, -1, -1);
-		}
+        private static final String oldSHADER_FRAG_SRC =
+                "precision mediump float;"+
+                "varying vec2 texCoords;"+
+                "uniform sampler2D drawTexture;"+
+                "uniform int level;"+
+                "void main() {"+
+                " 	gl_FragColor = texture2D(drawTexture, texCoords);"+
+               /* " 	if (level >= 0)"+   // in OpenGL ES 2.0 texture2DLod only in VertexShader
+                " 		gl_FragColor = texture2DLod(drawTexture, texCoords, level);"+*/
+                "}"
+        ;
 
-		@Override
-		public void view(int textureID, double x, double y) {
-			view(textureID, x, y, 1.0, 1.0);
-		}
+        private OGLBuffers createBuffers() {
+            float[] vertexBufferData = {
+                    0, 0, 0, 0,
+                    1, 0, 1, 0,
+                    0, 1, 0, 1,
+                    1, 1, 1, 1 };
+            short[] indexBufferData = { 0, 1, 2, 3 };
 
-		@Override
-		public void view(int textureID, double x, double y, double scale) {
-			view(textureID, x, y, scale, 1.0);
-		}
-		@Override
-		public void view(int textureID, double x, double y, double scale, double aspectXY) {
-			view(textureID, x, y, scale, aspectXY, -1);
-		}	
-		
-		@Override
-		public void view(int textureID, double x, double y, double scale, double aspectXY, int level) {
-			if (shaderProgram > 0) {
-				gl.glUseProgram(shaderProgram);
-				gl.glActiveTexture(GL2GL3.GL_TEXTURE0);
-				gl.glEnable(GL2GL3.GL_TEXTURE_2D);
-				gl.glUniformMatrix4fv(locMat, 1, false, ToFloatArray
-						.convert(new Mat4Scale(scale * aspectXY, scale, 1).mul(new Mat4Transl(x, y, 0))), 0);
-				gl.glUniform1i(locLevel, level);
-				gl.glBindTexture(GL2GL3.GL_TEXTURE_2D, textureID);
-				gl.glUniform1i(gl.glGetUniformLocation(shaderProgram, "drawTexture"), 0);
-				buffers.draw(GL2GL3.GL_TRIANGLE_STRIP, shaderProgram);
-				gl.glDisable(GL2GL3.GL_TEXTURE_2D);
-				gl.glUseProgram(0);
-			}
-		}
-		
-		@Override
-		public void finalize() throws Throwable {
-			super.finalize();
-			gl.glDeleteProgram(shaderProgram);
-		}
+            OGLBuffers.Attrib[] attributes = { new OGLBuffers.Attrib("inPosition", 2),
+                    new OGLBuffers.Attrib("inTexCoord", 2) };
 
-	}
-		
-	private static String getExtension(String s) {
-		String ext = "";
-		int i = s.lastIndexOf('.');
-		if (i > 0 && i < s.length() - 1) {
-			ext = s.substring(i + 1).toLowerCase();
-		}
-		return ext;
-	}
-	
-	static TextureData readTextureDataFromFile(GLProfile glProfile, String fileName) {
-			System.out.print("Reading texture file " + fileName);
-			try {
-				InputStream is = OGLTexture2D.class.getResourceAsStream(fileName);
-				//there are some problems on Mac OS with mipmap, in this case set false
-				TextureData data = TextureIO.newTextureData(glProfile, is, true,
-						getExtension(fileName));
-				is.close();
-				System.out.println(" ... OK");
-				return data;
-			} catch (IOException e) {
-				System.err.println(" failed");
-				throw new RuntimeException(e);
-			}
-	}
+            return new OGLBuffers(vertexBufferData, attributes, indexBufferData);
+        }
 
-	public OGLTexture2D(GL2GL3 gl, int width, int height, int textureId) {
-		this.gl = gl;
-		this.width = width;
-		this.height = height;
-		this.textureID[0] = textureId;
-	}
+        public Viewer(int maxGlEsVersion) {
+            if (OGLUtils.getVersionGLSL(maxGlEsVersion)<300) {
+                shaderProgram = ShaderUtils.loadProgramFromSource(maxGlEsVersion, oldSHADER_VERT_SRC, oldSHADER_FRAG_SRC, null);
+            }else {
+                shaderProgram = ShaderUtils.loadProgramFromSource(maxGlEsVersion, SHADER_VERT_SRC, SHADER_FRAG_SRC, null);
+            }
 
-	public OGLTexture2D(GL2GL3 gl, int width, int height, int internalFormat, int pixelFormat, int pixelType, Buffer buffer) {
-		this.gl = gl;
-		this.width = width;
-		this.height = height;
-		gl.glGenTextures(1, textureID, 0);
-		gl.glBindTexture(GL2GL3.GL_TEXTURE_2D, textureID[0]);
-		gl.glTexImage2D(GL2GL3.GL_TEXTURE_2D, 0, internalFormat, 
-				width, height, 0, 
-				pixelFormat, pixelType, buffer);
-		gl.glTexParameteri(GL2GL3.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_WRAP_S, GL2GL3.GL_CLAMP_TO_EDGE);
-		gl.glTexParameteri(GL2GL3.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_WRAP_T, GL2GL3.GL_CLAMP_TO_EDGE);
-		gl.glTexParameteri(GL2GL3.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_MIN_FILTER, GL2GL3.GL_LINEAR);
-		gl.glTexParameteri(GL2GL3.GL_TEXTURE_2D, GL2GL3.GL_TEXTURE_MAG_FILTER, GL2GL3.GL_LINEAR);
-	}
-	
-	public OGLTexture2D(GL2GL3 gl, TextureData textureData) {
-		this(gl, textureData.getWidth(),	textureData.getHeight(), 
-				textureData.getInternalFormat(), textureData.getPixelFormat(), 
-				textureData.getPixelType(), textureData.getBuffer());
-	}
-	
-	public OGLTexture2D(GL2GL3 gl, String fileName) {
-		this(gl, readTextureDataFromFile(gl.getGLProfile(), fileName));
-	}
-	
-	
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexture2D(GL2GL3 gl, OGLTexImageType image) {
-		this(gl, image.getWidth(),	image.getHeight(), 
-				image.getFormat().getInternalFormat(), image.getFormat().getPixelFormat(), 
-				image.getFormat().getPixelType(), image.getDataBuffer());
-	}
-	
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTextureBuffer(
-			OGLTexImage.Format<OGLTexImageType> format, Buffer buffer) {
-		bind();
-		gl.glTexSubImage2D(GL2GL3.GL_TEXTURE_2D, 0, 0, 0, getWidth(), getHeight(), 
-				format.getPixelFormat(), format.getPixelType(), buffer);
-	}
+            buffers = createBuffers();
+            locMat = GLES20.glGetUniformLocation(shaderProgram, "matTrans");
+            locLevel = GLES20.glGetUniformLocation(shaderProgram, "level");
+        }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> Buffer getTextureBuffer(
-			OGLTexImage.Format<OGLTexImageType> format) {
-		bind();
-		Buffer buffer = format.newBuffer(getWidth(), getHeight());
-		gl.glGetTexImage(GL2GL3.GL_TEXTURE_2D, 0, format.getPixelFormat(), format.getPixelType(), buffer);
-		return buffer;
-	}
+        @Override
+        public void view(int textureID) {
+            view(textureID, -1, -1);
+        }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTextureBuffer(
-			OGLTexImage.Format<OGLTexImageType> format, Buffer buffer, int level) {
-		bind();
-		gl.glTexSubImage2D(GL2GL3.GL_TEXTURE_2D, level, 0, 0, 
-				getWidth() >> level, getHeight() >> level, 
-				format.getPixelFormat(), format.getPixelType(), buffer);
-	}
+        @Override
+        public void view(int textureID, double x, double y) {
+            view(textureID, x, y, 1.0, 1.0);
+        }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> Buffer getTextureBuffer(
-			OGLTexImage.Format<OGLTexImageType> format, int level) {
-		bind();
-		Buffer buffer = format.newBuffer(getWidth() >> level, getHeight() >> level);
-		gl.glGetTexImage(GL2GL3.GL_TEXTURE_2D, level, format.getPixelFormat(), format.getPixelType(), buffer);
-		return buffer;
-	}
+        @Override
+        public void view(int textureID, double x, double y, double scale) {
+            view(textureID, x, y, scale, 1.0);
+        }
+        @Override
+        public void view(int textureID, double x, double y, double scale, double aspectXY) {
+            view(textureID, x, y, scale, aspectXY, -1);
+        }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTexImage(OGLTexImageType image) {
-		setTextureBuffer(image.getFormat(), image.getDataBuffer());
-	}
+        @Override
+        public void view(int textureID, double x, double y, double scale, double aspectXY, int level) {
+            if (shaderProgram > 0) {
+                GLES20.glUseProgram(shaderProgram);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+                GLES20.glEnable(GLES20.GL_TEXTURE_2D);
+                GLES20.glUniformMatrix4fv(locMat, 1, false, ToFloatArray
+                        .convert(new Mat4Scale(scale * aspectXY, scale, 1).mul(new Mat4Transl(x, y, 0))), 0);
+                GLES20.glUniform1i(locLevel, level);
+                GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID);
+                GLES20.glUniform1i(GLES20.glGetUniformLocation(shaderProgram, "drawTexture"), 0);
+                buffers.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram);
+                GLES20.glDisable(GLES20.GL_TEXTURE_2D);
+                GLES20.glUseProgram(0);
+            }
+        }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexImageType getTexImage(
-			OGLTexImage.Format<OGLTexImageType> format) {
-		OGLTexImageType image = format.newTexImage(getWidth(), getHeight());
-		image.setDataBuffer(getTextureBuffer(format));
-		return image;
-	}
+    }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTexImage(OGLTexImageType image, int level) {
-		setTextureBuffer(image.getFormat(), image.getDataBuffer(), level);
-	}
+    static Bitmap readTextureDataFromFile(Context context, String fileName) {
+        Log.i(TAG,"Reading texture file " + fileName);
+        try {
+            InputStream is = context.getAssets().open(fileName);
+            //there are some problems on Mac OS with mipmap, in this case set false
+            Bitmap data = BitmapFactory.decodeStream(is);
+            is.close();
+            Log.i(TAG," ... OK");
+            return data;
+        } catch (IOException e) {
+            Log.e(TAG," failed");
+            throw new RuntimeException(e);
+        }
+    }
 
-	public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexImageType getTexImage(
-			OGLTexImage.Format<OGLTexImageType> format, int level) {
-		OGLTexImageType image = format.newTexImage(getWidth() >> level, getHeight() >> level);
-		image.setDataBuffer(getTextureBuffer(format, level));
-		return image;
-	}
+    public OGLTexture2D(int width, int height, int textureId) {
+        this.width = width;
+        this.height = height;
+        this.textureID[0] = textureId;
+    }
 
-	public void bind() {
-		gl.glBindTexture(GL2GL3.GL_TEXTURE_2D, textureID[0]);
-	}
+    public OGLTexture2D(Bitmap textureData) {
+        this.width = textureData.getWidth();
+        this.height = textureData.getHeight();
+        GLES20.glGenTextures(1, textureID, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0]);
 
-	@Override
-	public void bind(int shaderProgram, String name, int slot) {
-		gl.glActiveTexture(GL2GL3.GL_TEXTURE0 + slot);
-		bind();
-		gl.glUniform1i(gl.glGetUniformLocation(shaderProgram, name), slot);
-	}
+        // A version of texImage2D that determines the internalFormat and type automatically.
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, textureData, 0);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
-	@Override
-	public void bind(int shaderProgram, String name) {
-		bind(shaderProgram, name, 0);
-	}
+        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+        textureData.recycle();
+    }
 
-	@Override
-	public int getTextureId(){
-		return textureID[0]; 
-	}
+    public OGLTexture2D(Context context, String fileName) {
+        this(readTextureDataFromFile(context, fileName));
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public void bind() {
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0]);
+    }
 
-	public int getHeight() {
-		return height;
-	}
+    @Override
+    public void bind(int shaderProgram, String name, int slot) {
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + slot);
+        bind();
+        GLES20.glUniform1i(GLES20.glGetUniformLocation(shaderProgram, name), slot);
+    }
 
-	public BufferedImage toBufferedImage() {
-		int[] array = new int[getWidth() * getHeight()];
-		bind();
-		gl.glGetTexImage(GL2GL3.GL_TEXTURE_2D, 0, GL2GL3.GL_RGBA, GL2GL3.GL_UNSIGNED_BYTE, IntBuffer.wrap(array));
-		BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-		image.setRGB(0, 0, getWidth(), getHeight(), array, 0, getWidth());
-		return image;
-	}
+    @Override
+    public void bind(int shaderProgram, String name) {
+        bind(shaderProgram, name, 0);
+    }
 
-	public void fromBufferedImage(BufferedImage img) {
-		bind();
-		int[] array = new int[getWidth() * getHeight()];
-		img.getRGB(0, 0, getWidth(), getHeight(), array, 0, getWidth());
-		gl.glTexSubImage2D(GL2GL3.GL_TEXTURE_2D, 0, 0, 0, getWidth(), getHeight(), GL2GL3.GL_RGBA,
-				GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV, IntBuffer.wrap(array));
-	}
+    @Override
+    public int getTextureId(){
+        return textureID[0];
+    }
 
-	@Override
-	public void finalize() throws Throwable{
-		super.finalize();
-		gl.glDeleteTextures(1, textureID, 0);
-	}
-	
+    public int getWidth() {
+        return width;
+    }
 
+    public int getHeight() {
+        return height;
+    }
 }
