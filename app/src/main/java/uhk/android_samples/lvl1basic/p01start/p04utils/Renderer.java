@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p01start.p04utils;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -20,7 +19,7 @@ import uhk.android_samples.oglutils.ShaderUtils;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
 
     private OGLBuffers buffers;
 
@@ -28,9 +27,9 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     private float time = 0;
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -45,13 +44,11 @@ public class Renderer implements GLSurfaceView.Renderer {
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
-        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,"shaders/lvl1basic/p01start/p04utils/start.vert",
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion,"shaders/lvl1basic/p01start/p04utils/start.vert",
                         "shaders/lvl1basic/p01start/p04utils/start.frag",null);
 
         //shorter version of loading shader program
-        //shaderProgram = shaderUtils.loadProgram("shaders/lvl1basic/p01start/p04utils/start");
+        //shaderProgram = shaderUtils.loadProgram(activity, "shaders/lvl1basic/p01start/p04utils/start");
 
         createBuffers();
 
@@ -79,7 +76,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         // bind and draw
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
-
+        activity.setViewText( "lvl1basic\np01start\np04utils");
     }
 
     private void createBuffers(){

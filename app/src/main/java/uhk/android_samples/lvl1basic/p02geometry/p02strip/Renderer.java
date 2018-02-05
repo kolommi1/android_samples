@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p02geometry.p02strip;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -22,7 +21,7 @@ import uhk.android_samples.transforms.Vec3D;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
     private int width, height;
 
     private OGLBuffers buffers, buffers2, buffers3;
@@ -34,9 +33,9 @@ public class Renderer implements GLSurfaceView.Renderer {
     private Camera cam = new Camera();
     private Mat4 proj; // created in onSurfaceChanged()
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -46,12 +45,10 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p02strip/simple");
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p02strip/simple");
         createBuffers();
 
         locMat = GLES20.glGetUniformLocation(shaderProgram, "mat");
@@ -123,9 +120,16 @@ public class Renderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(shaderProgram);
         GLES20.glUniformMatrix4fv(locMat, 1, false,
                 ToFloatArray.convert(cam.getViewMatrix().mul(proj)), 0);
-
+        activity.setViewText( "lvl1basic\np02geometry\np02strip\n");
+        if (polygons){
+            activity.appendViewText("polygon: fill\n");
+        }
+        else{
+            activity.appendViewText("polygon: line\n");
+        }
         switch(mode % 9){
             case 0:
+                activity.appendViewText("mode: all triangles of triangle list,\n without index buffer");
                 if (polygons){
                     buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
                 }
@@ -134,6 +138,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 1:
+                activity.appendViewText("mode: first 3 triangles of triangle list,\n without index buffer");
                 if (polygons){
                     //number of vertices
                     buffers.draw(GLES20.GL_TRIANGLES, shaderProgram, 9);
@@ -143,6 +148,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 2:
+                activity.appendViewText( "mode: 3rd, 4th and 5th triangles of triangle list,\n without index buffer");
                 if (polygons){
                     //number of vertices, index of the first vertex
                     buffers.draw(GLES20.GL_TRIANGLES, shaderProgram, 9, 6);
@@ -152,6 +158,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 3:
+                activity.appendViewText("mode: odd triangles of triangle list,\n with defined index buffer");
                 if (polygons){
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram);
                 }
@@ -160,6 +167,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 4:
+                activity.appendViewText("mode: 1st and 2nd odd triangles of triangle list,\n with defined index buffer");
                 if (polygons){
                     //number of vertices
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram, 6);
@@ -169,6 +177,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 5:
+                activity.appendViewText("mode: 2nd and 3rd odd triangles of triangle list,\n with defined index buffer");
                 if (polygons){
                     //number of vertices, index of the first vertex
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram, 6, 3);
@@ -178,6 +187,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 6:
+                activity.appendViewText("mode: all triangles of triangle strip,\n with defined index buffer");
                 if (polygons){
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram);
                 }
@@ -186,6 +196,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 7:
+                activity.appendViewText("mode: first 3 triangles of triangle strip,\n with defined index buffer");
                 if (polygons){
                     //number of vertices
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram, 5);
@@ -195,6 +206,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 }
                 break;
             case 8:
+                activity.appendViewText("mode: 3rd and 4th triangles of triangle strip,\n with defined index buffer");
                 if (polygons){
                     //number of vertices, index of the first vertex
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram, 4, 2);

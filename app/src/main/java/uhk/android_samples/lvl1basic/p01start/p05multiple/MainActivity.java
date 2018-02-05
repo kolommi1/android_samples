@@ -5,16 +5,22 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
+import android.widget.TextView;
+
+import uhk.android_samples.R;
 
 public class MainActivity extends Activity {
 
     private MyGLSurfaceView sample_GL_View;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sample_GL_View = new MyGLSurfaceView(this);
+        setContentView(R.layout.activity_main);
+        sample_GL_View = findViewById(R.id.mySurfaceView);
+        textView = findViewById(R.id.textView);
 
         // Check if the system supports OpenGL ES 2.0.
         final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -44,7 +50,22 @@ public class MainActivity extends Activity {
             throw new RuntimeException("Device does not support OpenGL ES 2.0");
         }
 
-        setContentView(sample_GL_View);
+    }
+
+    public void setViewText(String text){
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                textView.setText(text);
+            }
+        });
+    }
+
+    public void appendViewText(String text){
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                textView.append(text);
+            }
+        });
     }
 
     @Override

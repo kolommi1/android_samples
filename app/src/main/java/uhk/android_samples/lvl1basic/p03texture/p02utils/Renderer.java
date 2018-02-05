@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p03texture.p02utils;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
@@ -25,21 +24,21 @@ import uhk.android_samples.transforms.Vec3D;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
     private int width, height;
 
     private OGLBuffers buffers;
     private OGLTexture2D texture;
-    OGLTexture2D.Viewer textureViewer;
+    private OGLTexture2D.Viewer textureViewer;
 
     private int shaderProgram, locMat;
 
     private Camera cam = new Camera();
     private Mat4 proj;
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -49,15 +48,13 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
         if (OGLUtils.getVersionGLSL(maxGlEsVersion)<300)
-            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/textureOld");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/textureOld");
         else
-            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/texture");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/texture");
 
         createBuffers();
 
@@ -67,7 +64,7 @@ public class Renderer implements GLSurfaceView.Renderer {
         // texture files are in /assets/textures/
 
         Log.i("Textures","Loading texture...");
-        texture = new OGLTexture2D(context, "textures/mosaic.jpg");
+        texture = new OGLTexture2D(activity, "textures/mosaic.jpg");
 
         cam = cam.withPosition(new Vec3D(5, 5, 2.5))
                         .withAzimuth(Math.PI * 1.25)
@@ -91,6 +88,8 @@ public class Renderer implements GLSurfaceView.Renderer {
         texture.bind(shaderProgram, "textureID", 0);
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
         textureViewer.view(texture, -1, -1, 0.5);
+
+        activity.setViewText( "lvl1basic\np03texture\np02utils");
     }
 
     @Override

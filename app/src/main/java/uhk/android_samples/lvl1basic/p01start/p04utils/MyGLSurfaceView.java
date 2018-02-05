@@ -19,5 +19,9 @@ public class MyGLSurfaceView extends GLSurfaceView {
         super(context, attrs);
     }
 
-
+    // Hide superclass method to access renderer.
+    public void setRenderer(uhk.android_samples.lvl1basic.p01start.p04utils.Renderer renderer) {
+        this.renderer = renderer;
+        super.setRenderer(renderer);
+    }
 }

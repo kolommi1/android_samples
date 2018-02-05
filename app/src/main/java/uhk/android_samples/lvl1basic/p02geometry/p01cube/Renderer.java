@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p02geometry.p01cube;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -22,7 +21,7 @@ import uhk.android_samples.transforms.Vec3D;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
     private int width, height;
 
     private OGLBuffers buffers;
@@ -32,9 +31,9 @@ public class Renderer implements GLSurfaceView.Renderer {
     private Camera cam = new Camera();
     private Mat4 proj; // created in onSurfaceChanged()
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -44,12 +43,10 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,  "shaders/lvl1basic/p02geometry/p01cube/simple");
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion,  "shaders/lvl1basic/p02geometry/p01cube/simple");
         createBuffers();
 
         locMat = GLES20.glGetUniformLocation(shaderProgram, "mat");
@@ -130,7 +127,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         // bind and draw
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
-
+        activity.setViewText( "lvl1basic\np02geometry\np01cube");
     }
 
     @Override

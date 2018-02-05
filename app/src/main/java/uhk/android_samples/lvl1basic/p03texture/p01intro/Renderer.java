@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p03texture.p01intro;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
@@ -8,7 +7,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -16,7 +14,6 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import uhk.android_samples.oglutils.OGLBuffers;
-import uhk.android_samples.oglutils.OGLModelOBJ;
 import uhk.android_samples.oglutils.OGLUtils;
 import uhk.android_samples.oglutils.ShaderUtils;
 import uhk.android_samples.oglutils.ToFloatArray;
@@ -31,7 +28,7 @@ import uhk.android_samples.transforms.Vec3D;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
     private int width, height;
 
     private OGLBuffers buffers;
@@ -41,9 +38,9 @@ public class Renderer implements GLSurfaceView.Renderer {
     private Camera cam = new Camera();
     private Mat4 proj;
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -53,15 +50,13 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
         if (OGLUtils.getVersionGLSL(maxGlEsVersion)<300)
-            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/textureOld");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/textureOld");
         else
-            shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/texture");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion,  "shaders/lvl1basic/p03texture/p01intro/texture");
 
         createBuffers();
 
@@ -99,6 +94,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         bindTexture();
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
+        activity.setViewText( "lvl1basic\np03texture\np01intro");
     }
 
     @Override
@@ -111,7 +107,7 @@ public class Renderer implements GLSurfaceView.Renderer {
     }
 
 
-    void createBuffers() {
+    private void createBuffers() {
         // vertices are not shared among triangles (and thus faces) so each face
         // can have a correct normal in all vertices
         // also because of this, the vertices can be directly drawn as GL_TRIANGLES
@@ -170,7 +166,7 @@ public class Renderer implements GLSurfaceView.Renderer {
         buffers = new OGLBuffers(cube, attributes, indexBufferData);
     }
 
-    void bindTexture() {
+    private void bindTexture() {
         // bind texture to a shader uniform variable via a texture slot 0
         // first bind texture to slot 0
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0); // slot 0
@@ -198,7 +194,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         InputStream is = null;
         try {
-            is = context.getAssets().open(fileName);
+            is = activity.getAssets().open(fileName);
         } catch (IOException e) {
             Log.e("Textures","File not found ");
             e.printStackTrace();

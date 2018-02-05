@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p02geometry.p03obj;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -23,7 +22,7 @@ import uhk.android_samples.transforms.Vec3D;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
     private int width, height;
 
     private OGLBuffers buffers;
@@ -39,10 +38,11 @@ public class Renderer implements GLSurfaceView.Renderer {
                             0, 0, 0, 1,
     });
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
+
 
     @Override
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
@@ -51,19 +51,17 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/ducky");
-        //shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/teapot");
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/ducky");
+        //shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p02geometry/p03obj/teapot");
 
         // obj files are in  /assets/objects/...
-        model = new OGLModelOBJ(context, "objects/ducky.obj");
-        //model = new OGLModelOBJ(context, "objects/Teapot.obj");
-        //model= new OGLModelOBJ(context,"objects/ElephantBody.obj");
-        //model= new OGLModelOBJ(context,"objects/TexturedCube.obj");
+        model = new OGLModelOBJ(activity, "objects/ducky.obj");
+        //model = new OGLModelOBJ(activity, "objects/Teapot.obj");
+        //model= new OGLModelOBJ(activity,"objects/ElephantBody.obj");
+        //model= new OGLModelOBJ(activity,"objects/TexturedCube.obj");
 
         buffers = model.getBuffers();
 
@@ -87,6 +85,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 ToFloatArray.convert(swapYZ.mul(cam.getViewMatrix()).mul(proj)), 0);
 
         buffers.draw(model.getTopology(), shaderProgram);
+        activity.setViewText( "lvl1basic\np02geometry\np03obj");
     }
 
     @Override

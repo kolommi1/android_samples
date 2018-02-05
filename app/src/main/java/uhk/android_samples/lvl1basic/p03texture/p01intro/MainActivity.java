@@ -7,12 +7,14 @@ import android.content.pm.ConfigurationInfo;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import uhk.android_samples.R;
 
 public class MainActivity extends Activity {
 
     private MyGLSurfaceView sample_GL_View;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +22,7 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main);
         sample_GL_View = findViewById(R.id.mySurfaceView);
+        textView = findViewById(R.id.textView);
 
         addButtonsToRelativeLayout(findViewById(R.id.mainLayout));
 
@@ -51,6 +54,22 @@ public class MainActivity extends Activity {
             throw new RuntimeException("Device does not support OpenGL ES 2.0");
         }
 
+    }
+
+    public void setViewText(String text){
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                textView.setText(text);
+            }
+        });
+    }
+
+    public void appendViewText(String text){
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                textView.append(text);
+            }
+        });
     }
 
     @Override

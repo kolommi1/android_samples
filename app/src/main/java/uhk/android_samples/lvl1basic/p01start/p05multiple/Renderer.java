@@ -1,6 +1,5 @@
 package uhk.android_samples.lvl1basic.p01start.p05multiple;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -17,7 +16,7 @@ import uhk.android_samples.oglutils.ShaderUtils;
 public class Renderer implements GLSurfaceView.Renderer {
 
     private int maxGlEsVersion;
-    private Context context;
+    private MainActivity activity;
 
     private OGLBuffers buffers, buffers2;
 
@@ -25,9 +24,9 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     private float time = 0;
 
-    Renderer(Context context, int maxGlEsVersion){
+    Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
-        this.context = context;
+        this.activity = activity;
     }
 
     @Override
@@ -39,14 +38,11 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
 
-
-        //TODO: print text with OGLutils - render text to texture, render texture
-
         // shader files are in /assets/ directory - must be created
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
-        shaderProgram = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p01start/p05multiple/start");
-        shaderProgram2 = ShaderUtils.loadProgram(context, maxGlEsVersion, "shaders/lvl1basic/p01start/p05multiple/start2");
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p01start/p05multiple/start");
+        shaderProgram2 = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p01start/p05multiple/start2");
         createBuffers();
 
 
@@ -80,7 +76,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         // bind and draw
         buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram2);
-
+        activity.setViewText( "lvl1basic\np01start\np05multiple");
     }
 
     private void createBuffers(){
