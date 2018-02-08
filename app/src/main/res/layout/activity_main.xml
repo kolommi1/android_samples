@@ -5,13 +5,13 @@
     android:layout_height="match_parent"
     android:id="@+id/mainLayout">
 
-    <uhk.android_samples.lvl1basic.p04target.p02utils.MyGLSurfaceView
+    <uhk.android_samples.lvl1basic.p04target.p03postproces.MyGLSurfaceView
         android:id="@+id/mySurfaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"> </uhk.android_samples.lvl1basic.p04target.p02utils.MyGLSurfaceView>
+        android:layout_alignParentTop="true"> </uhk.android_samples.lvl1basic.p04target.p03postproces.MyGLSurfaceView>
 
     <TextView
         android:id="@+id/textView"

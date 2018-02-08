@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".lvl1basic.p04target.p02utils.MainActivity">
+        <activity android:name=".lvl1basic.p04target.p03postproces.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
