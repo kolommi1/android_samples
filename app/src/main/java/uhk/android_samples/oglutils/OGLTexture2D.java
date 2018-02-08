@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 
 import uhk.android_samples.transforms.Mat4Scale;
 import uhk.android_samples.transforms.Mat4Transl;
@@ -174,6 +175,20 @@ public class OGLTexture2D implements OGLTexture{
 
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
         textureData.recycle();
+    }
+
+    public OGLTexture2D( int width, int height, int internalFormat, int pixelFormat, int pixelType, Buffer buffer) {
+        this.width = width;
+        this.height = height;
+        GLES20.glGenTextures(1, textureID, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0]);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, internalFormat,
+                width, height, 0,
+                pixelFormat, pixelType, buffer);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
     }
 
     public OGLTexture2D(Context context, String fileName) {

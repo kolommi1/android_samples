@@ -1,4 +1,4 @@
-package uhk.android_samples.lvl1basic.p04target.p01intro;
+package uhk.android_samples.lvl1basic.p04target.p02utils;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -8,6 +8,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import uhk.android_samples.oglutils.OGLBuffers;
+import uhk.android_samples.oglutils.OGLRenderTarget;
 import uhk.android_samples.oglutils.OGLTexture2D;
 import uhk.android_samples.oglutils.OGLUtils;
 import uhk.android_samples.oglutils.ShaderUtils;
@@ -19,7 +20,7 @@ import uhk.android_samples.transforms.Mat4Scale;
 import uhk.android_samples.transforms.Vec3D;
 
 /**
- * Render to texture instead of on screen, using OpenGL functions
+ * Render to texture instead of on screen, using OGLRenderTarget from oglutils
  */
 public class Renderer implements GLSurfaceView.Renderer {
 
@@ -35,11 +36,7 @@ public class Renderer implements GLSurfaceView.Renderer {
     private Camera cam = new Camera();
     private Mat4 proj;
 
-    private int[] colorBuffer = new int[1];
-    private int[] depthBuffer = new int[1];
-    private int[] frameBuffer = new int[1];
-
-    private final static String TAG = "OGLTarget";
+    private OGLRenderTarget renderTarget;
 
     Renderer(MainActivity activity, int maxGlEsVersion){
         this.maxGlEsVersion = maxGlEsVersion;
@@ -53,7 +50,7 @@ public class Renderer implements GLSurfaceView.Renderer {
         OGLUtils.shaderCheck(maxGlEsVersion);
         OGLUtils.printOGLparameters(maxGlEsVersion);
 
-        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p04target/p01intro/texture");
+        shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p04target/p02utils/texture");
 
         createBuffers();
 
@@ -61,7 +58,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         texture = new OGLTexture2D(activity, "textures/mosaic.jpg");
 
-        createTarget(200, 200);
+        renderTarget = new OGLRenderTarget( 200, 200);
 
         cam = cam.withPosition(new Vec3D(5, 5, 2.5))
                         .withAzimuth(Math.PI * 1.25)
@@ -70,44 +67,14 @@ public class Renderer implements GLSurfaceView.Renderer {
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
     }
 
-    private void createTarget( int targetWidth, int targetHeight) {
-        GLES20.glGenTextures(1, colorBuffer, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, colorBuffer[0]);
-        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, targetWidth, targetHeight, 0,
-                GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
 
-        GLES20.glGenRenderbuffers(1, depthBuffer,0);
-        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, depthBuffer[0]);
-        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT, width, height);
-        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
-                GLES20.GL_RENDERBUFFER, depthBuffer[0]);
-
-        GLES20.glGenFramebuffers(1, frameBuffer, 0);
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
-        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                GLES20.GL_TEXTURE_2D, colorBuffer[0], 0);
-
-        if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER) != GLES20.GL_FRAMEBUFFER_COMPLETE) {
-            Log.i(TAG,"There is a problem with the FBO");
-        }
-    }
-
-    private void bindColorBufferAsTexture() {
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, colorBuffer[0]);
-        int locTexture = GLES20.glGetUniformLocation(shaderProgram, "textureID");
-        GLES20.glUniform1i(locTexture, 0);
-    }
 
     @Override
     public void onDrawFrame(GL10 glUnused) {
         GLES20.glUseProgram(shaderProgram);
 
         // set our render target (texture)
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
-        GLES20.glViewport(0, 0, 200, 200);
+        renderTarget.bind();
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
@@ -125,13 +92,15 @@ public class Renderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // use the result of the previous draw as a texture for the next
-        bindColorBufferAsTexture();
+        renderTarget.bindColorTexture(shaderProgram, "textureID", 0);
+        // use the depth buffer from the previous draw as a texture for the next
+        //renderTarget.bindDepthTexture(shaderProgram, "textureID", 0);
 
         GLES20.glUniformMatrix4fv(locMat, 1, false,
                 ToFloatArray.convert(cam.getViewMatrix().mul(proj)), 0);
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
 
-        activity.setViewText( "lvl1basic\np04target\np01intro");
+        activity.setViewText( "lvl1basic\np04target\np02utils");
     }
 
     @Override
