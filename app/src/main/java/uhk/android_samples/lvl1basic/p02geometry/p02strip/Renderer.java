@@ -24,7 +24,7 @@ public class Renderer implements GLSurfaceView.Renderer {
     private MainActivity activity;
     private int width, height;
 
-    private OGLBuffers buffers, buffers2, buffers3;
+    private OGLBuffers buffers, buffers2, buffers3, buffers4, buffers5;
     private int mode = 0;
     private boolean polygons = true;
 
@@ -73,7 +73,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                 0, 0, 0,	0, -1, 0,
                 1, 1, 0,	0, -1, 0,
                 0, 1, 0,	0, -1, 0,
-                // 3st triangle
+                // 3rd triangle
                 1, 1, 0,	-1, 0, 0,
                 0, 1, 0,	-1, 0, 0,
                 1, 2, 0,	-1, 0, 0,
@@ -111,6 +111,19 @@ public class Renderer implements GLSurfaceView.Renderer {
         short[] indexBufferData2 = {0,1,2,5,8,11,14,17};
         //create geometry with index buffer as the triangle strip
         buffers3 = new OGLBuffers(strip, attributes, indexBufferData2);
+
+        short[] indexBufferData3 = new short[18];
+        for (int i = 0; i<9; i+=3){
+            indexBufferData3[i*2] = (short)(2*i);      indexBufferData3[i*2+1] = (short)(2*i+1);
+            indexBufferData3[i*2+2] = (short)(2*i+1);  indexBufferData3[i*2+3] = (short)(2*i+2);
+            indexBufferData3[i*2+4] = (short)(2*i+2);  indexBufferData3[i*2+5] = (short)(2*i);
+        }
+        //create geometry with index buffer as the line list
+        buffers4 = new OGLBuffers(strip, attributes, indexBufferData3);
+
+        short[] indexBufferData4 = {1,0,2,1,5,2,8,5,11,8,14,11,17,14};
+        //create geometry with index buffer as the line strip
+        buffers5 = new OGLBuffers(strip, attributes, indexBufferData4);
     }
 
     @Override
@@ -163,7 +176,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINES, shaderProgram);
+                    buffers4.draw(GLES20.GL_LINES, shaderProgram);
                 }
                 break;
             case 4:
@@ -173,7 +186,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram, 6);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINES, shaderProgram, 6);
+                    buffers4.draw(GLES20.GL_LINES, shaderProgram, 12);
                 }
                 break;
             case 5:
@@ -183,7 +196,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers2.draw(GLES20.GL_TRIANGLES, shaderProgram, 6, 3);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINES, shaderProgram, 6, 3);
+                    buffers4.draw(GLES20.GL_LINES, shaderProgram, 12, 6);
                 }
                 break;
             case 6:
@@ -192,7 +205,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINE_STRIP, shaderProgram);
+                    buffers5.draw(GLES20.GL_LINE_STRIP, shaderProgram);
                 }
                 break;
             case 7:
@@ -202,7 +215,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram, 5);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINE_STRIP, shaderProgram, 5);
+                    buffers5.draw(GLES20.GL_LINE_STRIP, shaderProgram, 8);
                 }
                 break;
             case 8:
@@ -212,7 +225,7 @@ public class Renderer implements GLSurfaceView.Renderer {
                     buffers3.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram, 4, 2);
                 }
                 else{
-                    buffers.draw(GLES20.GL_LINE_STRIP, shaderProgram, 4, 2);
+                    buffers5.draw(GLES20.GL_LINE_STRIP, shaderProgram, 6, 4);
                 }
                 break;
         }
