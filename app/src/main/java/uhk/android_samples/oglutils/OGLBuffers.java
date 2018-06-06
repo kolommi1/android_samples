@@ -177,7 +177,7 @@ public class OGLBuffers {
 		if (indexBuffer == null) {
 			GLES20.glDrawArrays(topology, start, count);
 		} else {
-			GLES20.glDrawElements(topology, count, GLES20.GL_UNSIGNED_SHORT, start * 4);
+			GLES20.glDrawElements(topology, count, GLES20.GL_UNSIGNED_SHORT, start * 2);
 		}
 		unbind();
 	}

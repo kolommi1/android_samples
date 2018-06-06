@@ -77,18 +77,29 @@ public class Renderer implements GLSurfaceView.Renderer {
                 GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
                 GLES20.GL_LINEAR);
-
-        GLES20.glGenRenderbuffers(1, depthBuffer,0);
-        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, depthBuffer[0]);
-        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT, width, height);
-        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
-                GLES20.GL_RENDERBUFFER, depthBuffer[0]);
+        if(OGLUtils.checkExtension(maxGlEsVersion,"GL_OES_depth_texture"))
+        {
+            GLES20.glGenTextures(1, depthBuffer, 0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, depthBuffer[0]);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_DEPTH_COMPONENT, targetWidth,
+                    targetHeight, 0, GLES20.GL_DEPTH_COMPONENT, GLES20.GL_UNSIGNED_INT, null);
+        }
+        else {
+            GLES20.glGenRenderbuffers(1, depthBuffer,0);
+            GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, depthBuffer[0]);
+            GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT, width, height);
+            GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
+            GLES20.GL_RENDERBUFFER, depthBuffer[0]);
+        }
 
         GLES20.glGenFramebuffers(1, frameBuffer, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
                 GLES20.GL_TEXTURE_2D, colorBuffer[0], 0);
-
+        if(OGLUtils.checkExtension(maxGlEsVersion,"GL_OES_depth_texture")) {
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
+                    GLES20.GL_TEXTURE_2D, depthBuffer[0], 0);
+        }
         if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER) != GLES20.GL_FRAMEBUFFER_COMPLETE) {
             Log.i(TAG,"There is a problem with the FBO");
         }

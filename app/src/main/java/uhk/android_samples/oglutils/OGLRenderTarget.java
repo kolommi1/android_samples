@@ -35,7 +35,7 @@ public class OGLRenderTarget {
 		GLES20.glGenFramebuffers(1, frameBuffer, 0);
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]);
 		for (int i = 0; i < count; i++)
-			GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0 + i, GLES20.GL_TEXTURE_2D,
+			GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0   + i, GLES20.GL_TEXTURE_2D,
 					colorBuffers[i].getTextureId(), 0);
 
 		GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_TEXTURE_2D,
