@@ -126,6 +126,28 @@ public class OGLUtils {
 		}
 	}
 
+	/**
+	 * Check OpenGL ES Extension support
+	 *
+	 * @param maxGlEsVersion maximum supported OpenGL ES version
+	 * @param extension extension name
+	 */
+	public static boolean checkExtension(int maxGlEsVersion, String extension) {
+		String extensions;
+		if(maxGlEsVersion >= 0x31000){
+			extensions = GLES30.glGetString(GLES31.GL_EXTENSIONS);
+		}
+		else if(maxGlEsVersion >= 0x30000){
+			extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+		}
+		else{
+			extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+		}
+
+		return (extensions.contains(extension));
+
+	}
+
 /*	/**
 	 * Return correct debug object
 	 *
