@@ -111,7 +111,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         OGLBuffers.Attrib[] attributes = {
                 new OGLBuffers.Attrib("inPosition", 3), // 2 floats
-                new OGLBuffers.Attrib("inColor", 3) // 3 floats
+                new OGLBuffers.Attrib("inNormal", 3) // 3 floats
         };
         buffers = new OGLBuffers(cube, attributes, indexBufferData);
 
