@@ -148,6 +148,47 @@ public class OGLUtils {
 
 	}
 
+	/**
+	 * Log implementation dependent information
+	 *
+	 */
+	public static void checkImplementationDependentConstants() {
+		int[] query = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_VERTEX_ATTRIBS,query, 0 );
+		Log.i(TAG,"Maximum Vertex attributes: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_VERTEX_UNIFORM_VECTORS,query, 0 );
+		Log.i(TAG,"Maximum Vertex uniform vectors: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_VARYING_VECTORS,query, 0 );
+		Log.i(TAG,"Maximum Varying vectors: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, query, 0 );
+		Log.i(TAG,"Maximum Vertex texture image units: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,query, 0 );
+		Log.i(TAG,"Maximum Combined texture image units: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS,query, 0 );
+		Log.i(TAG,"Maximum Texture image units: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_FRAGMENT_UNIFORM_VECTORS,query, 0 );
+		Log.i(TAG,"Maximum Fragment uniform vectors: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_RENDERBUFFER_SIZE,query, 0 );
+		Log.i(TAG,"Maximum render buffer size: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_CUBE_MAP_TEXTURE_SIZE,query, 0 );
+		Log.i(TAG,"Maximum cube map texture size: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE,query, 0 );
+		Log.i(TAG,"Maximum texture size: "+ Integer.toString(query[0]));
+
+		GLES20.glGetIntegerv(GLES20.GL_MAX_VIEWPORT_DIMS,query, 0 );
+		Log.i(TAG,"Maximum viewport dims: "+ Integer.toString(query[0]));
+
+	}
+
 /*	/**
 	 * Return correct debug object
 	 *
