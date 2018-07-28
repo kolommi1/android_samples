@@ -12,6 +12,8 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import uhk.android_samples.oglutils.OGLUtils;
+
 /**
  * Sending minimal geometry to GPU and compiling a shader from a string
  */
@@ -20,10 +22,22 @@ public class Renderer implements GLSurfaceView.Renderer {
     private int[] vertexBuffer = new int[1], indexBuffer = new int[1];
     private int shaderProgram;
 
+    private int maxGlEsVersion;
+
+    Renderer(int maxGlEsVersion){
+        this.maxGlEsVersion = maxGlEsVersion;
+    }
+
     @Override
     public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
         // barva pozadí
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // check whether shaders are supported
+        OGLUtils.shaderCheck(maxGlEsVersion);
+
+        // print OpenGL parametres
+        OGLUtils.printOGLparameters(maxGlEsVersion);
 
         createBuffers();
         createShaders();

@@ -22,7 +22,8 @@ public class MainActivity extends Activity {
         // Check if the system supports OpenGL ES 2.0.
         final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-        final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
+        final int maxGlEsVersion = configurationInfo.reqGlEsVersion;
+        final boolean supportsEs2 = maxGlEsVersion >= 0x20000;
 
         if (supportsEs2)
         {
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
             sample_GL_View.setEGLContextClientVersion(2);
 
             // Set the renderer
-            sample_GL_View.setRenderer(new Renderer());
+            sample_GL_View.setRenderer(new Renderer(maxGlEsVersion));
         }
         else
         {
