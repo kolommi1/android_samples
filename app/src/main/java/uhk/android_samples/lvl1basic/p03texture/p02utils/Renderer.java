@@ -52,9 +52,9 @@ public class Renderer implements GLSurfaceView.Renderer {
         // in android studio: right click module(app)->New->Folder->Assets Folder
         // in this project: android_samples\app\src\main\assets
         if (OGLUtils.getVersionGLSL(maxGlEsVersion)<300)
-            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/textureOld");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p02utils/textureOld");
         else
-            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p01intro/texture");
+            shaderProgram = ShaderUtils.loadProgram(activity, maxGlEsVersion, "shaders/lvl1basic/p03texture/p02utils/texture");
 
         createBuffers();
 
