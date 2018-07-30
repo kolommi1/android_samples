@@ -4,6 +4,7 @@ package uhk.android_samples.oglutils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
@@ -145,6 +146,7 @@ public class OGLTexture2D implements OGLTexture{
             InputStream is = context.getAssets().open(fileName);
             //there are some problems on Mac OS with mipmap, in this case set false
             Bitmap data = BitmapFactory.decodeStream(is);
+            data = FlipBitmap(data);
             is.close();
             Log.i(TAG," ... OK");
             return data;
@@ -154,20 +156,29 @@ public class OGLTexture2D implements OGLTexture{
         }
     }
 
+    public static Bitmap FlipBitmap(Bitmap bitmap) {
+        Matrix matrix = new Matrix();
+        matrix.postScale(1, -1, bitmap.getWidth()/2f, bitmap.getHeight()/2f);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
     public OGLTexture2D(int width, int height, int textureId) {
         this.width = width;
         this.height = height;
         this.textureID[0] = textureId;
     }
 
-    public OGLTexture2D(Bitmap textureData) {
+    public OGLTexture2D(Bitmap textureData){
+    	this(GLUtils.getInternalFormat(textureData), GLUtils.getType(textureData), textureData);
+    }
+
+    public OGLTexture2D( int internalFormat, int type, Bitmap textureData) {
         this.width = textureData.getWidth();
-        this.height = textureData.getHeight();
+        this.height =textureData.getHeight();
         GLES20.glGenTextures(1, textureID, 0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0]);
 
-        // A version of texImage2D that determines the internalFormat and type automatically.
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, textureData, 0);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, internalFormat, textureData, type, 0);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
