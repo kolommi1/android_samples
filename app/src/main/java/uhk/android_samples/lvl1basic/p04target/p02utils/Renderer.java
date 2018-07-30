@@ -109,7 +109,7 @@ public class Renderer implements GLSurfaceView.Renderer {
         this.height = height;
 
         GLES20.glViewport(0, 0, width, height);
-        proj = new Mat4PerspRH(Math.PI / 4, height / (double) width, 0.01, 1000.0);
+        proj = new Mat4PerspRH(Math.PI / 4, height / (double) width, 1.0, 100.0);
     }
 
 
