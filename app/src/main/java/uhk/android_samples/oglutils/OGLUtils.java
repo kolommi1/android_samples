@@ -195,16 +195,7 @@ public class OGLUtils {
 	 * @param gl
 	 * @return
 	 */
-/*	public static GL2GL3 getDebugGL(GL2GL3 gl){
-		int version = getVersionOpenGL(gl);
-		if (version < 300)
-			return new DebugGL2(gl.getGL2());
-		if (version < 400)
-			return new DebugGL3(gl.getGL3());
-		return new DebugGL4(gl.getGL4());
-	}
-
-*/	/**
+	/**
 	 * Check GL error
 	 *
 	 * @param longReport

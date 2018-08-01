@@ -206,6 +206,68 @@ public class OGLTexture2D implements OGLTexture{
         this(readTextureDataFromFile(context, fileName));
     }
 
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexture2D( OGLTexImageType image) {
+        this( image.getWidth(),	image.getHeight(),
+                image.getFormat().getInternalFormat(), image.getFormat().getPixelFormat(),
+                image.getFormat().getPixelType(), image.getDataBuffer());
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTextureBuffer(
+            OGLTexImage.Format<OGLTexImageType> format, Buffer buffer) {
+        bind();
+        GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, getWidth(), getHeight(),
+                format.getPixelFormat(), format.getPixelType(), buffer);
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> Buffer getTextureBuffer(
+            OGLTexImage.Format<OGLTexImageType> format) {
+        bind();
+        Buffer buffer = format.newBuffer(getWidth(), getHeight());
+   //     GLES20.glGetTexImage(GLES20.GL_TEXTURE_2D, 0, format.getPixelFormat(), format.getPixelType(), buffer);
+        GLES20.glReadPixels(0, 0, width, height, format.getPixelFormat(), format.getPixelType(), buffer);
+        return buffer;
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTextureBuffer(
+            OGLTexImage.Format<OGLTexImageType> format, Buffer buffer, int level) {
+        bind();
+        GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, level, 0, 0,
+                getWidth() >> level, getHeight() >> level,
+                format.getPixelFormat(), format.getPixelType(), buffer);
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> Buffer getTextureBuffer(
+            OGLTexImage.Format<OGLTexImageType> format, int level) {
+        bind();
+        Buffer buffer = format.newBuffer(getWidth() >> level, getHeight() >> level);
+      //  GLES20.glGetTexImage(GLES20.GL_TEXTURE_2D, level, format.getPixelFormat(), format.getPixelType(), buffer);
+        GLES20.glReadPixels(0, 0, width, height, format.getPixelFormat(), format.getPixelType(), buffer);
+
+        return buffer;
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTexImage(OGLTexImageType image) {
+        setTextureBuffer(image.getFormat(), image.getDataBuffer());
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexImageType getTexImage(
+            OGLTexImage.Format<OGLTexImageType> format) {
+        OGLTexImageType image = format.newTexImage(getWidth(), getHeight());
+        image.setDataBuffer(getTextureBuffer(format));
+        return image;
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> void setTexImage(OGLTexImageType image, int level) {
+        setTextureBuffer(image.getFormat(), image.getDataBuffer(), level);
+    }
+
+    public <OGLTexImageType extends OGLTexImage<OGLTexImageType>> OGLTexImageType getTexImage(
+            OGLTexImage.Format<OGLTexImageType> format, int level) {
+        OGLTexImageType image = format.newTexImage(getWidth() >> level, getHeight() >> level);
+        image.setDataBuffer(getTextureBuffer(format, level));
+        return image;
+    }
+
     public void bind() {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0]);
     }
@@ -234,4 +296,6 @@ public class OGLTexture2D implements OGLTexture{
     public int getHeight() {
         return height;
     }
+
+
 }
