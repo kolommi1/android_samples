@@ -102,6 +102,15 @@ public class OGLTexture2D implements OGLTexture{
             locLevel = GLES20.glGetUniformLocation(shaderProgram, "level");
         }
 
+        protected Viewer(int maxGlEsVersion, int shaderProgram) {
+            buffers = createBuffers();
+            this.shaderProgram = shaderProgram;
+            locMat = GLES20.glGetUniformLocation(shaderProgram, "matTrans");
+            locLevel = GLES20.glGetUniformLocation(shaderProgram, "level");
+        }
+
+
+
         @Override
         public void view(int textureID) {
             view(textureID, -1, -1);
@@ -145,6 +154,7 @@ public class OGLTexture2D implements OGLTexture{
         try {
             InputStream is = context.getAssets().open(fileName);
             //there are some problems on Mac OS with mipmap, in this case set false
+
             Bitmap data = BitmapFactory.decodeStream(is);
             data = FlipBitmap(data);
             is.close();
