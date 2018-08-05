@@ -15,7 +15,7 @@ import java.nio.Buffer;
 
 import uhk.android_samples.transforms.Mat4Scale;
 import uhk.android_samples.transforms.Mat4Transl;
-
+/** requires GL_EXT_shader_texture_lod */
 public class OGLTexture2D implements OGLTexture{
 	private final int[] textureID = new int[1];
     private final int width, height;
@@ -65,14 +65,15 @@ public class OGLTexture2D implements OGLTexture{
         ;
 
         private static final String oldSHADER_FRAG_SRC =
+                "#extension GL_EXT_shader_texture_lod : enable\n"+// adds texture2DLod to fragment shader
                 "precision mediump float;"+
                 "varying vec2 texCoords;"+
                 "uniform sampler2D drawTexture;"+
-                "uniform int level;"+
+                "uniform float level;"+
                 "void main() {"+
                 " 	gl_FragColor = texture2D(drawTexture, texCoords);"+
-               /* " 	if (level >= 0)"+   // in OpenGL ES 2.0 texture2DLod only in VertexShader
-                " 		gl_FragColor = texture2DLod(drawTexture, texCoords, level);"+*/
+                " 	if (level >= 0.0)"+   // in OpenGL ES 2.0 texture2DLod only in VertexShader
+                " 		gl_FragColor = texture2DLodEXT(drawTexture, texCoords, level);"+
                 "}"
         ;
 
@@ -138,7 +139,7 @@ public class OGLTexture2D implements OGLTexture{
                 GLES20.glEnable(GLES20.GL_TEXTURE_2D);
                 GLES20.glUniformMatrix4fv(locMat, 1, false, ToFloatArray
                         .convert(new Mat4Scale(scale * aspectXY, scale, 1).mul(new Mat4Transl(x, y, 0))), 0);
-                GLES20.glUniform1i(locLevel, level);
+                GLES20.glUniform1f(locLevel, level);
                 GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID);
                 GLES20.glUniform1i(GLES20.glGetUniformLocation(shaderProgram, "drawTexture"), 0);
                 buffers.draw(GLES20.GL_TRIANGLE_STRIP, shaderProgram);
@@ -194,7 +195,7 @@ public class OGLTexture2D implements OGLTexture{
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
-        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
+    //    GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
         textureData.recycle();
     }
 
@@ -234,7 +235,14 @@ public class OGLTexture2D implements OGLTexture{
         bind();
         Buffer buffer = format.newBuffer(getWidth(), getHeight());
    //     GLES20.glGetTexImage(GLES20.GL_TEXTURE_2D, 0, format.getPixelFormat(), format.getPixelType(), buffer);
-        GLES20.glReadPixels(0, 0, width, height, format.getPixelFormat(), format.getPixelType(), buffer);
+        int[] fboIds = new int[1];
+        GLES20.glGenFramebuffers(1, fboIds, 0);
+        int fboId = fboIds[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, textureID[0],0);
+        GLES20.glReadPixels(0, 0, width, height,format.getPixelFormat(), format.getPixelType(), buffer);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         return buffer;
     }
 
@@ -251,7 +259,15 @@ public class OGLTexture2D implements OGLTexture{
         bind();
         Buffer buffer = format.newBuffer(getWidth() >> level, getHeight() >> level);
       //  GLES20.glGetTexImage(GLES20.GL_TEXTURE_2D, level, format.getPixelFormat(), format.getPixelType(), buffer);
-        GLES20.glReadPixels(0, 0, width, height, format.getPixelFormat(), format.getPixelType(), buffer);
+
+        int[] fboIds = new int[1];
+        GLES20.glGenFramebuffers(1, fboIds, 0);
+        int fboId = fboIds[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, textureID[0], level);
+        GLES20.glReadPixels(0, 0, width, height,format.getPixelFormat(), format.getPixelType(), buffer);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         return buffer;
     }

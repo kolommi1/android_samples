@@ -38,7 +38,7 @@ public class OGLUtils {
 			Log.i(TAG,"GLES version: " + GLES20.glGetString(GLES20.GL_VERSION));
 			Log.i(TAG,"GLES shading language version: " + GLES20.glGetString(GLES20.GL_SHADING_LANGUAGE_VERSION)
 					+ " (#version " + getVersionGLSL(maxGlEsVersion) + ")");
-			Log.i(TAG,"GLES extensions: " + GLES31.glGetString(GLES20.GL_EXTENSIONS));
+			Log.i(TAG,"GLES extensions: " + GLES20.glGetString(GLES20.GL_EXTENSIONS));
 		}
 	}
 
