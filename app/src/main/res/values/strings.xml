@@ -3,4 +3,8 @@
     <string name="btn_first">First person</string>
     <string name="btn_mode">Mode</string>
     <string name="btn_polygons">Polygons</string>
+    <string name="btn_tex_mode">Tex mode</string>
+    <string name="btn_level">Level</string>
+    <string name="btn_tex_source">Texture</string>
+    <string name="btn_interpolation">Interpolation</string>
 </resources>
