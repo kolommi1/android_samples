@@ -3,11 +3,14 @@ package uhk.android_samples.lvl2advanced.p03texture.p01quad;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import java.nio.Buffer;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import uhk.android_samples.oglutils.OGLBuffers;
 import uhk.android_samples.oglutils.OGLRenderTarget;
+import uhk.android_samples.oglutils.OGLTexImageByte;
 import uhk.android_samples.oglutils.OGLTexImageFloat;
 import uhk.android_samples.oglutils.OGLTexture2D;
 import uhk.android_samples.oglutils.OGLUtils;
@@ -111,7 +114,7 @@ public class Renderer implements GLSurfaceView.Renderer {
         //update image
         return image;
     }
-
+    OGLTexImageByte imageGrid;
     @Override
     public void onDrawFrame(GL10 glUnused) {
         //render to texture
@@ -150,20 +153,12 @@ public class Renderer implements GLSurfaceView.Renderer {
         buffers.draw(GLES20.GL_TRIANGLES, shaderProgram);
         //end of render to texture
 
-    /*    BufferedImage img = renderTarget2.getColorTexture().toBufferedImage();
-        Graphics gr = img.getGraphics();
-        gr.setColor(new Color(0xff0000ff)); //red
-        gr.drawLine(0, 0, img.getWidth(), 150);
-        gr.setColor(new Color(0xff00ff00));  //green
-        gr.drawLine(0, 0, 150, img.getHeight());
-        gr.setColor(new Color(0xffff0000)); //blue
-        gr.drawLine(0, 0, img.getWidth()/2, img.getHeight()/2);
-        img.setRGB(0, 0, 0xffffffff); //white
-        gr.setColor(new Color(0xffffffff)); //white
-        String data = "Buffered Image";
-        //char[] data = new char[] {'Buffered Image'};
-        gr.drawChars(data.toCharArray(), 0, data.length(), 100, 100);
-        renderTarget2.getColorTexture().fromBufferedImage(img);*/
+        imageGrid =  renderTarget2.getColorTexture().getTexImage(new OGLTexImageByte.Format(4));
+        drawLine( 0, 0, 150, imageGrid.getHeight(),0, (byte)0xff0000);//horni
+        drawLine( 0, 0, imageGrid.getWidth(), 150,1, (byte)0xff0000);//dolni
+        drawLine( 0, 0, imageGrid.getWidth()/2, imageGrid.getHeight()/2,2, (byte)0xffffffff);//prostřední*/
+
+        renderTarget2.getColorTexture().setTexImage(imageGrid);
 
         // set the default render target (screen)
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
@@ -191,6 +186,58 @@ public class Renderer implements GLSurfaceView.Renderer {
         textureViewer.view(renderTarget2.getColorTexture(), -0.5, -1, 0.5);
 
         activity.setViewText( "lvl2advanced\np03texture\np01quad");
+    }
+    /**DDA  */
+    public void drawLine( double x1, double y1, double x2, double y2,int component, byte color){
+
+        final double dx = x2-x1;
+        final double dy = y2-y1;
+
+        if (Math.abs(y2 - y1) <= Math.abs(x2 - x1)) {
+            if ((x1 == x2) && (y1 == y2)) {
+                imageGrid.setPixel((int)x1, (int)y1, component, color);
+            } else {
+                if (x2 < x1) {
+                    double tmp = x2;
+                    x2 = x1;
+                    x1 = tmp;
+
+                    tmp = y2;
+                    y2 = y1;
+                    y1 = tmp;
+                }
+
+                final double k = dy/dx;
+                int cele_y;
+                double y = y1;
+                for (int x = (int) x1; x <= x2; x++) {
+                    cele_y = (int)Math.round(y);
+                    imageGrid.setPixel(x, cele_y,component, color);
+                    y += k;
+                }
+            }
+
+        } else {
+            if (y2 < y1) {
+                double tmp = x2;
+                x2 = x1;
+                x1 = tmp;
+
+                tmp = y2;
+                y2 = y1;
+                y1 = tmp;
+            }
+
+            final double k = dx/dy;
+            int cele_x;
+            double x = x1;
+            for (int y = (int) y1; y <= y2; y++) {
+                cele_x = (int)Math.round(x);
+                imageGrid.setPixel(cele_x, y,component, color);
+                x += k;
+            }
+        }
+
     }
 
     @Override
