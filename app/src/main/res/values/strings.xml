@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">android_samples</string>
     <string name="btn_first">First person</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_modify">Draw</string>
     <string name="btn_mode">Mode</string>
     <string name="btn_polygons">Polygons</string>
     <string name="btn_tex_mode">Tex mode</string>

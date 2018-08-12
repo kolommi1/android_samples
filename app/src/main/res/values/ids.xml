@@ -13,4 +13,5 @@
     <item type="id" name="btn_interpolation" />
     <item type="id" name="btn_level" />
     <item type="id" name="btn_tex_source" />
+    <item type="id" name="btn_save" />
 </resources>
