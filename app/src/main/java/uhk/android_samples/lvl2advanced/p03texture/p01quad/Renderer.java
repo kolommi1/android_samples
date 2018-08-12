@@ -72,10 +72,10 @@ public class Renderer implements GLSurfaceView.Renderer {
         texture3 = new OGLTexture2D(activity, "textures/testTexture.gif");
         texture4 = new OGLTexture2D(activity, "textures/testTexture.bmp");
 
-        texture.setTexImage(addAxes(texture.getTexImage(new OGLTexImageFloat.Format(4))));
-        texture2.setTexImage(addAxes(texture2.getTexImage(new OGLTexImageFloat.Format(4))));
-        texture3.setTexImage(addAxes(texture3.getTexImage(new OGLTexImageFloat.Format(4))));
-        texture4.setTexImage(addAxes(texture4.getTexImage(new OGLTexImageFloat.Format(4))));
+        texture.setTexImage(addAxes(texture.getTexImage(new OGLTexImageByte.Format(4))));
+        texture2.setTexImage(addAxes(texture2.getTexImage(new OGLTexImageByte.Format(4))));
+        texture3.setTexImage(addAxes(texture3.getTexImage(new OGLTexImageByte.Format(4))));
+        texture4.setTexImage(addAxes(texture4.getTexImage(new OGLTexImageByte.Format(4))));
 
         cam = cam.withPosition(new Vec3D(0.5, 0.5, 2))
                 .withAzimuth(Math.PI /2)
@@ -91,26 +91,26 @@ public class Renderer implements GLSurfaceView.Renderer {
 
     }
 
-    private OGLTexImageFloat addAxes(OGLTexImageFloat image){
+    private OGLTexImageByte addAxes(OGLTexImageByte image){
         int bold = 10;
         //draw axes to texture
         for (int i = 0; i<image.getWidth(); i++)
             for(int j=0; j<bold; j++){
-                image.setPixel(i, j, 0, 1.0f); //red
-                image.setPixel(i, j, 1, 0.0f); //green
-                image.setPixel(i, j, 2, 0.0f); //blue
+                image.setPixel(i, j, 0, (byte)0xff); //red
+                image.setPixel(i, j, 1, (byte)0x00); //green
+                image.setPixel(i, j, 2, (byte)0x00); //blue
             }
         for (int i = 0; i<image.getHeight(); i++)
             for(int j=0; j<bold; j++){
-                image.setPixel(j, i, 0, 0.0f); //red
-                image.setPixel(j, i, 1, 1.0f); //green
-                image.setPixel(j, i, 2, 0.0f); //blue
+                image.setPixel(j, i, 0, (byte)0x00); //red
+                image.setPixel(j, i, 1, (byte)0xff); //green
+                image.setPixel(j, i, 2, (byte)0x00); //blue
             }
         for (int i = 0; i<bold; i++)
             for(int j=0; j<bold; j++){
-                image.setPixel(j, i, 0, 0.0f); //red
-                image.setPixel(j, i, 1, 0.0f); //green
-                image.setPixel(j, i, 2, 1.0f); //blue
+                image.setPixel(j, i, 0, (byte)0x00); //red
+                image.setPixel(j, i, 1, (byte)0x00); //green
+                image.setPixel(j, i, 2, (byte)0xff); //blue
             }
         //update image
         return image;
@@ -139,7 +139,7 @@ public class Renderer implements GLSurfaceView.Renderer {
 
         //add axis to rendered texture and update
         renderTarget1.getColorTexture().setTexImage(
-                addAxes(renderTarget1.getColorTexture().getTexImage(new OGLTexImageFloat.Format(4))));
+                addAxes(renderTarget1.getColorTexture().getTexImage(new OGLTexImageByte.Format(4))));
 
         //render to texture
         renderTarget2.bind();
