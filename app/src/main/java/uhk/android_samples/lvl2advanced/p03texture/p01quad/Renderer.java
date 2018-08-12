@@ -38,6 +38,7 @@ public class Renderer implements GLSurfaceView.Renderer {
     private OGLTexture2D texture2;
     private OGLTexture2D texture3;
     private OGLTexture2D texture4;
+    private OGLTexImageByte imageGrid;
 
     private Camera cam = new Camera();
     private Mat4 proj;
@@ -81,8 +82,8 @@ public class Renderer implements GLSurfaceView.Renderer {
                 .withZenith(-Math.PI /2);
 
 
-        renderTarget1 = new OGLRenderTarget(500, 500);
-        renderTarget2 = new OGLRenderTarget(500, 500);
+        renderTarget1 = new OGLRenderTarget(texture.getWidth(), texture.getHeight());
+        renderTarget2 = new OGLRenderTarget(texture.getWidth(), texture.getHeight());
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         textureViewer = new OGLTexture2D.Viewer(maxGlEsVersion);
@@ -114,11 +115,13 @@ public class Renderer implements GLSurfaceView.Renderer {
         //update image
         return image;
     }
-    OGLTexImageByte imageGrid;
+
     @Override
     public void onDrawFrame(GL10 glUnused) {
+
         //render to texture
         renderTarget1.bind();
+
 
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
@@ -212,7 +215,9 @@ public class Renderer implements GLSurfaceView.Renderer {
                 double y = y1;
                 for (int x = (int) x1; x <= x2; x++) {
                     cele_y = (int)Math.round(y);
+                    imageGrid.setPixel(x, cele_y-1,component, color);
                     imageGrid.setPixel(x, cele_y,component, color);
+                    imageGrid.setPixel(x, cele_y+1,component, color);
                     y += k;
                 }
             }
@@ -233,7 +238,9 @@ public class Renderer implements GLSurfaceView.Renderer {
             double x = x1;
             for (int y = (int) y1; y <= y2; y++) {
                 cele_x = (int)Math.round(x);
+                imageGrid.setPixel(cele_x-1, y,component, color);
                 imageGrid.setPixel(cele_x, y,component, color);
+                imageGrid.setPixel(cele_x+1, y,component, color);
                 x += k;
             }
         }

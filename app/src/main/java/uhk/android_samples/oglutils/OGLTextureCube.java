@@ -128,7 +128,7 @@ public class OGLTextureCube implements OGLTexture {
     private void setTarget(Bitmap data, int target) {
         targetSize[target] = new TargetSize(data.getWidth(), data.getHeight());
 
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_CUBE_MAP_POSITIVE_X + target, 0, GLUtils.getInternalFormat(data), data, GLUtils.getType(data), 0);
+        GLUtils.texImage2D(TARGETS[target], 0, GLUtils.getInternalFormat(data), data, GLUtils.getType(data), 0);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
@@ -192,6 +192,13 @@ public class OGLTextureCube implements OGLTexture {
         Buffer buffer = ByteBuffer.allocateDirect(targetSize[cubeFaceIndex].getWidth()
                 * targetSize[cubeFaceIndex].getHeight() * 4);
     //    GLES20.glGetTexImage(TARGETS[cubeFaceIndex], 0, format.getPixelFormat(), format.getPixelType(), buffer);
+        int[] frameBufferID = new int[1];
+        GLES20.glGenFramebuffers(1, frameBufferID, 0);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBufferID[0]);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, textureID[0],0);
+        GLES20.glReadPixels(0, 0, targetSize[cubeFaceIndex].getWidth(), targetSize[cubeFaceIndex].getHeight(),format.getPixelFormat(), format.getPixelType(), buffer);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         return buffer;
     }
 

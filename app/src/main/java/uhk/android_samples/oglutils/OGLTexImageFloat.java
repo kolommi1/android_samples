@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-// requires OES_texture_float, EXT_texture_rg extension
+// requires OES_texture_float
 public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
     private final float[] data;
     private final int width, height, depth;
@@ -20,17 +20,13 @@ public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
             this.componentCount = componentCount;
         }
 
-        public static final int
-                GL_RED_EXT = 0x1903,
-                GL_RG_EXT  = 0x8227;
-
         @Override
         public int getInternalFormat() {
             switch (componentCount) {
                 case 1:
-                    return GL_RED_EXT;
+                    return GLES20.GL_LUMINANCE;
                 case 2:
-                    return GL_RG_EXT;
+                    return GLES20.GL_LUMINANCE_ALPHA;
                 case 3:
                     return GLES20.GL_RGB;
                 case 4:
@@ -44,9 +40,9 @@ public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
         public int getPixelFormat() {
             switch (componentCount) {
                 case 1:
-                    return GL_RED_EXT;
+                    return GLES20.GL_LUMINANCE;
                 case 2:
-                    return GL_RG_EXT;
+                    return GLES20.GL_LUMINANCE_ALPHA;
                 case 3:
                     return GLES20.GL_RGB;
                 case 4:
@@ -58,7 +54,7 @@ public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
 
         @Override
         public int getPixelType() {
-            return GLES20.GL_FLOAT;
+            return GLES20.GL_UNSIGNED_BYTE ;
         }
 
         @Override
@@ -126,7 +122,7 @@ public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
 
         @Override
         public int getPixelType() {
-            return GLES20.GL_FLOAT;
+            return GLES20.GL_UNSIGNED_BYTE;
         }
     }
 
@@ -217,8 +213,7 @@ public class OGLTexImageFloat implements OGLTexImage<OGLTexImageFloat> {
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                     for (int i = 0; i < componentCount; i++)
-                        array[z * width * height * componentCount
-                                + y * width * componentCount + x * componentCount
+                        array[z * width * height * componentCount + y * width * componentCount + x * componentCount
                                 + i] = (byte) (Math.min(data[z * width * height * format.getComponentCount()
                                 + y * width * format.getComponentCount()
                                 + x * format.getComponentCount() + i % format.getComponentCount()], 1.0) * 255.0);

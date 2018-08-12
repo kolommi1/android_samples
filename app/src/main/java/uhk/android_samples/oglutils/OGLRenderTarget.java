@@ -16,7 +16,7 @@ public class OGLRenderTarget {
 		this( width, height, 1);
 	}
 
-	private OGLRenderTarget( int width, int height, int count) {
+	public OGLRenderTarget( int width, int height, int count) {
 		this.width = width;
 		this.height = height;
 		this.count = count;
