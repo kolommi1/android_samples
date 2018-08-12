@@ -1,7 +1,16 @@
 package uhk.android_samples.oglutils;
 
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
+import android.opengl.GLException;
+import android.util.Log;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -10,6 +19,7 @@ public class OGLTexImageByte implements OGLTexImage<OGLTexImageByte> {
     private final byte[] data;
     private final int width, height, depth;
     private final OGLTexImage.Format<OGLTexImageByte> format;
+    private static final String TAG = "OGLTexImageByte";
 
     public static class Format implements OGLTexImage.Format<OGLTexImageByte> {
         private final int componentCount;
@@ -18,17 +28,13 @@ public class OGLTexImageByte implements OGLTexImage<OGLTexImageByte> {
             this.componentCount = componentCount;
         }
 
-        public static final int
-                GL_RED_EXT = 0x1903,
-                GL_RG_EXT  = 0x8227;
-
         @Override
         public int getInternalFormat() {
             switch (componentCount) {
                 case 1:
-                    return GL_RED_EXT;
+                return GLES20.GL_LUMINANCE;
                 case 2:
-                    return GL_RG_EXT;
+                    return GLES20.GL_LUMINANCE_ALPHA;
                 case 3:
                     return GLES20.GL_RGB;
                 case 4:
@@ -42,9 +48,9 @@ public class OGLTexImageByte implements OGLTexImage<OGLTexImageByte> {
         public int getPixelFormat() {
             switch (componentCount) {
                 case 1:
-                    return GL_RED_EXT;
+                    return GLES20.GL_LUMINANCE;
                 case 2:
-                    return GL_RG_EXT;
+                    return GLES20.GL_LUMINANCE_ALPHA;
                 case 3:
                     return GLES20.GL_RGB;
                 case 4:
@@ -240,20 +246,49 @@ public class OGLTexImageByte implements OGLTexImage<OGLTexImageByte> {
         return value;
     }
 
-  /*  public void save(GLProfile glp, String fileName) {
-        TextureData textureData = new TextureData(glp,
-                format.getInternalFormat(), width, height, 0,
-                format.getPixelFormat(), format.getPixelType(),
-                false, false, false, getDataBuffer(), null);
+    public void save(Context context, String fileName) {
+        Bitmap bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
+        bitmap.copyPixelsFromBuffer(getDataBuffer());
+
+        File directory = context.getDir("OGLimages", Context.MODE_PRIVATE);
+        // create directory
+        File file = new File(directory,fileName);
+
+        FileOutputStream os = null;
         try {
             Log.i(TAG,"Saving texture " + fileName );
-            TextureIO.write(textureData, new File(fileName));
+            os = new FileOutputStream(file);
+            // compress BitMap
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+            os.close();
             Log.i(TAG," ... OK");
+            Log.i(TAG,directory.getAbsolutePath());
         } catch (GLException | IOException e) {
             Log.e(TAG,"failed");
             Log.e(TAG, e.getMessage());
-            e.printStackTrace();
         }
-    }*/
+
+    }
+
+    public static class FormatDepth extends OGLTexImageByte.Format {
+        public FormatDepth() {
+            super(1);
+        }
+
+        @Override
+        public int getInternalFormat() {
+            return GLES20.GL_DEPTH_COMPONENT;
+        }
+
+        @Override
+        public int getPixelFormat() {
+            return GLES20.GL_DEPTH_COMPONENT;
+        }
+
+        @Override
+        public int getPixelType() {
+            return GLES20.GL_UNSIGNED_BYTE;
+        }
+    }
 
 }
